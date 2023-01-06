@@ -1,0 +1,9 @@
+org\jspace\tests\TestTcpGates.class
+org\jspace\tests\TestTuple.class
+org\jspace\tests\TestSpaces.class
+org\jspace\tests\TestGates.class
+org\jspace\tests\TestjSonMessageSerialization.class
+org\jspace\tests\TestRemoteSpace.class
+org\jspace\tests\TestTemplate.class
+org\jspace\tests\TestFieldMatching.class
+org\jspace\tests\TestSpaceRepository.class
