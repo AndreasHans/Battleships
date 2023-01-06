@@ -1,15 +1,20 @@
 package org.battleships;
 
+import org.jspace.ActualField;
 import org.jspace.FormalField;
 import org.jspace.SequentialSpace;
 import org.jspace.Space;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class main {
 
     public static void main(String[] argv) throws InterruptedException {
-        Space inbox = new SequentialSpace();
-        inbox.put("Hello HI!");
-        Object[] tuple = inbox.get(new FormalField(String.class));
-        System.out.println(tuple[0]);
+        Space ships = new SequentialSpace();
+        GameActions gameActions = new GameActions(5,5);
+
+
+
     }
 }
