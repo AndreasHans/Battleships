@@ -14,11 +14,11 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="Battleships" target="1.8" />
       <module name="common" target="1.8" />
       <module name="diningphilosophers" target="1.8" />
       <module name="examples" target="1.8" />
       <module name="helloworld" target="1.8" />
-      <module name="jspace" target="1.8" />
       <module name="pingpong" target="1.8" />
       <module name="producerconsumer" target="1.8" />
     </bytecodeTargetLevel>

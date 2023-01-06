@@ -4,13 +4,6 @@ import org.jspace.FormalField;
 import org.jspace.SequentialSpace;
 import org.jspace.Space;
 
-/**
- * A simple HelloWorld program.
- *
- *
- * @author Michele Loreti
- *
- */
 public class main {
 
     public static void main(String[] argv) throws InterruptedException {

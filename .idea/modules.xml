@@ -2,10 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/Battleships.iml" filepath="$PROJECT_DIR$/Battleships.iml" />
       <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
       <module fileurl="file://$PROJECT_DIR$/examples/DiningPhilosophers/diningphilosophers.iml" filepath="$PROJECT_DIR$/examples/DiningPhilosophers/diningphilosophers.iml" />
       <module fileurl="file://$PROJECT_DIR$/examples/HelloWorld/helloworld.iml" filepath="$PROJECT_DIR$/examples/HelloWorld/helloworld.iml" />
-      <module fileurl="file://$PROJECT_DIR$/jspace.iml" filepath="$PROJECT_DIR$/jspace.iml" />
       <module fileurl="file://$PROJECT_DIR$/examples/PingPong/pingpong.iml" filepath="$PROJECT_DIR$/examples/PingPong/pingpong.iml" />
       <module fileurl="file://$PROJECT_DIR$/examples/ProducerConsumer/producerconsumer.iml" filepath="$PROJECT_DIR$/examples/ProducerConsumer/producerconsumer.iml" />
     </modules>
