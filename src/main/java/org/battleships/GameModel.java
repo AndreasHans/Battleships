@@ -9,21 +9,38 @@ import java.util.List;
 
 public class GameModel {
     private int HEIGHT,WIDTH;
-    FormalField INT = new FormalField(Integer.class);
+    private FormalField INT = new FormalField(Integer.class);
 
     public GameModel(int width, int height){
         this.HEIGHT = height;
         this.WIDTH = width;
     };
 
-    public void tryGenerateNbyN(int x0, int y0, int n, int id, Space space) throws InterruptedException {
-        ArrayList<Point> points = new ArrayList<Point>();
-        for(int x = x0; x < x0 + n; x++){
-            for(int y = y0; y < y0 + n; y++){
+    //PUBLIC
+    public void tryShootAt(int x, int y, Space space) throws InterruptedException {
+        if(!isInsideBoard(x,y) || hasShotAt(x,y,space)) {
+            //try again
+        }else{
+            shootAt(x,y,space);
+        }
+    }
+
+    public boolean hasShotAt(int x, int y, Space space) throws InterruptedException {
+        Object[] obj = space.queryp(new ActualField(x),new ActualField(y),INT);
+        return obj != null && Integer.parseInt(obj[2].toString()) == 0;
+    }
+
+    public void tryGenerateNbyM(int x0, int y0, int n, int m, int id, Space space) throws InterruptedException {
+        ArrayList<Point> points = new ArrayList<>();
+        int x1 = x0 + n;
+        int y1 = y0 + m;
+
+        for(int x = x0; x < x1; x++){
+            for(int y = y0; y < y1; y++){
                 points.add(new Point(x,y));
             }
         }
-        tryGenerateShip(points,id,space);
+        tryGenerateShipFromList(points,id,space);
     }
 
     public void tryGenerateL(int x0, int y0, int id, Space space) throws InterruptedException {
@@ -36,28 +53,7 @@ public class GameModel {
         for(int i = 1; i < b; i++){
             points.add(new Point(x0+i,y0));
         }
-        tryGenerateShip(points,id,space);
-    }
-
-    public void tryGenerateShip(ArrayList<Point> points, int id, Space space) throws InterruptedException {
-        if(isValidShipPlacement(points,space)){
-            generateShip(points,id,space);
-        }
-        else{
-            //System.out.println("Not valid ship placement!");
-        }
-    }
-
-    public void generateShip(ArrayList<Point> list, int id, Space space) throws InterruptedException {
-        for(Point p: list){
-            generateFieldAt(p.x,p.y,id,space);
-        }
-    }
-
-    public void generateFieldAt(int x, int y, int id, Space space) throws InterruptedException {
-        if (isValidField(x,y,space)){
-            space.put(x,y,id);
-        }
+        tryGenerateShipFromList(points,id,space);
     }
 
     public void removeShipById(int id, Space space) throws InterruptedException {
@@ -68,23 +64,16 @@ public class GameModel {
         return space.queryp(INT,INT,new ActualField(id)) != null;
     }
 
-    public boolean isEmptyField(int x, int y, Space space) throws InterruptedException {
-        Object[] obj = space.queryp(new ActualField(x),new ActualField(y),INT);
-        return obj == null;
-    }
+    public Point[] getShipPointsById(int id, Space space) throws InterruptedException {
+        ArrayList<Point> points = new ArrayList<>();
+        List<Object[]> parts = space.queryAll(INT, INT, new ActualField(id));
 
-    public boolean isInsideBoard(int x,int y){
-        return !(x < 0 || x >= this.WIDTH || y < 0 || y >= this.HEIGHT);
-    }
-
-    public boolean isValidField(int x,int y,Space space) throws InterruptedException {
-        return isEmptyField(x,y,space) && isInsideBoard(x,y);
-    }
-    public boolean isValidShipPlacement(ArrayList<Point> points, Space space) throws InterruptedException {
-        for(Point p: points){
-            if (!isValidField(p.x,p.y,space)) return false;
+        for(Object[] obj: parts){
+            int x = Integer.parseInt(obj[0].toString());
+            int y = Integer.parseInt(obj[1].toString());
+            points.add(new Point(x,y));
         }
-        return true;
+        return (Point[]) points.toArray();
     }
 
     public void printElemsInSpaceById(Space space, int id) throws InterruptedException {
@@ -96,5 +85,51 @@ public class GameModel {
         System.out.println("End");
     }
 
+    //PRIVATE
+    private void shootAt(int x,int y, Space space) throws InterruptedException {
+        space.getp(new ActualField(x),new ActualField(y),INT);
+        space.put(x,y,0);
+    }
+
+    private void tryGenerateShipFromList(ArrayList<Point> points, int id, Space space) throws InterruptedException {
+        if(isValidShipPlacement(points,space)){
+            generateShipFromList(points,id,space);
+        }
+        else{
+            //System.out.println("Not valid ship placement!");
+        }
+    }
+
+    private void generateShipFromList(ArrayList<Point> list, int id, Space space) throws InterruptedException {
+        for(Point p: list){
+            generateFieldAt(p.x,p.y,id,space);
+        }
+    }
+
+    private void generateFieldAt(int x, int y, int id, Space space) throws InterruptedException {
+        if (isValidFieldPlacement(x,y,space)){
+            space.put(x,y,id);
+        }
+    }
+
+    private boolean isEmptyField(int x, int y, Space space) throws InterruptedException {
+        Object[] obj = space.queryp(new ActualField(x),new ActualField(y),INT);
+        return obj == null;
+    }
+
+    private boolean isInsideBoard(int x,int y){
+        return !(x < 0 || x >= this.WIDTH || y < 0 || y >= this.HEIGHT);
+    }
+
+    private boolean isValidFieldPlacement(int x, int y, Space space) throws InterruptedException {
+        return isEmptyField(x,y,space) && isInsideBoard(x,y);
+    }
+
+    private boolean isValidShipPlacement(ArrayList<Point> points, Space space) throws InterruptedException {
+        for(Point p: points){
+            if (!isValidFieldPlacement(p.x,p.y,space)) return false;
+        }
+        return true;
+    }
 
 }
