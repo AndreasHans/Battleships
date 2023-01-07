@@ -3,18 +3,39 @@ package org.battleships;
 public class GameView {
     public int n = 5;//how wide the board is, or in other words, how many x positions
     public int m = 5;//how tall the board is, or in other words, how many y positions
-    private char boardEnemy[][] = new char[n][m];
-    private char boardYou[][] = new char[n][m];
+    private char[][] boardEnemy = new char[n][m];
+    private char[][] boardYou = new char[n][m];
 
-    private String fieldBottom = "___|";
-    private String fieldTop = "   |";
+    private final String fieldBottom = "___|";
+    private final String fieldTop = "   |";
     private final String fieldLeft = " ";
     private final String fieldRight = " |";
     private final String spacing = "      |";
+
     private StringBuilder bottomFieldLine = new StringBuilder("");
     private StringBuilder topFieldLine = new StringBuilder("");
+    private StringBuilder topLine = new StringBuilder("   |");
+/*
+USER MANUAL: first, create a gameView object with a n times m board
+    GameView gameView = new GameView(n,m);
+Then, use the following to change the board
+    gameView.setShipYou(x,y);
+    gameView.markMissEnemy(x,y);
+    gameView.markHitEnemy(x,y);
+    gameView.markHitYou(x,y);
+    gameView.markMissYou(x,y);
+with you being the right board, where your ships are located, and enemy being the left, where you shoot
+lastly, print the board using
+    gameView.BoardBuilder();
+    */
 
-    public void setUp(){
+
+    public GameView(int x, int y){
+        n = x;
+        m = y;
+        boardEnemy = new char[n][m];
+        boardYou= new char[n][m];
+
         //fills the board with empty spaces
         setUpEnemy();
         setUpYou();
@@ -26,44 +47,37 @@ public class GameView {
         bottomFieldBuilder();
         bottomFieldLine.append(spacing);
         bottomFieldBuilder();
+        //readies the top line
+        topLineBuilder();
 
-
-
-        preset();//must be deleted before game starts - for testing. Should also stay in the bottom of setup
     }
 
-
-    public GameView(){
-        topLine();//prints the top most line
-
-
+    public void BoardBuilder(){
+        System.out.println(topLine);
         for(int i = 0; i < m; i++){//prints most of the board, each cycle printing the bottom of the field before, the top of this field, and the middle of this field
             System.out.println(bottomFieldLine);
             System.out.println(topFieldLine);
 
             //build the middle of the field start
             StringBuilder currentLine = new StringBuilder(fieldLeft);
-            currentLine.append(m).append(fieldRight);
+            currentLine.append(i).append(fieldRight);
             for(int j = 0; j < n; j++){//intputs the right chars in enemy board
                 currentLine.append(fieldLeft).append(boardEnemy[j][i]).append(fieldRight);
             }
-            currentLine.append(spacing).append(fieldLeft).append(m).append(fieldRight);
+            currentLine.append(spacing).append(fieldLeft).append(i).append(fieldRight);
             for(int j= 0; j < n; j++){
                 currentLine.append(fieldLeft).append(boardYou[j][i]).append(fieldRight);
-            }
-            //build the middle of the field end
+            }//build the middle of the field end
 
             System.out.println(currentLine);
-
         }
-
-
         System.out.println(bottomFieldLine);
-
-
+        System.out.println();
+        System.out.println();
+        System.out.println();
     }
 
-    public void setBoardYou(int x, int y){//for placing ships
+    public void setShipYou(int x, int y){//for placing ships
         boardYou[x][y] = 'X';
     }
 
@@ -84,9 +98,7 @@ public class GameView {
     }
 
 
-    private void topLine(){//builds the line of the board that has the x coordinates, and prints it.
-        StringBuilder topLine = new StringBuilder("   |");
-
+    private void topLineBuilder(){//builds the line of the board that has the x coordinates, and prints it.
         for(int i = 0; i < n;i++){
             topLine.append(fieldLeft).append(i).append(fieldRight);
         }
@@ -94,8 +106,6 @@ public class GameView {
         for(int i = 0; i < n;i++){
             topLine.append(fieldLeft).append(i).append(fieldRight);
         }
-        System.out.println(topLine);
-        //TODO: refactor this so it just builds the line. should save a bit of work
     }
 
     private void topFieldBuilder(){//builds the topmost line of a field, the one that looks a bit like this:    |   |   |   |
@@ -127,12 +137,12 @@ public class GameView {
         }
     }
 
-    private void preset(){//for testing purposes
-        setBoardYou(0,2);
-        setBoardYou(0,3);
-        setBoardYou(0,4);
-        setBoardYou(1,4);
-        setBoardYou(3,3);
+    public void preset(){//for testing purposes
+        setShipYou(0,2);
+        setShipYou(0,3);
+        setShipYou(0,4);
+        setShipYou(1,4);
+        setShipYou(3,3);
     }
 
 }

@@ -14,6 +14,18 @@ public class main {
         Space ships = new SequentialSpace();
         GameActions gameActions = new GameActions(5,5);
 
+        GameView gameView = new GameView(6,6);
+        gameView.preset();
+        gameView.setShipYou(0,5);
+        gameView.markMissEnemy(2,2);
+        gameView.markHitEnemy(1,1);
+        gameView.markHitYou(0,3);
+        gameView.markMissYou(4,2);
+        gameView.BoardBuilder();
+
+
+
+
 
 
     }
