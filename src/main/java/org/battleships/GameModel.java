@@ -7,11 +7,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class GameActions {
+public class GameModel {
     private int HEIGHT,WIDTH;
     FormalField INT = new FormalField(Integer.class);
 
-    public GameActions(int width, int height){
+    public GameModel(int width, int height){
         this.HEIGHT = height;
         this.WIDTH = width;
     };
@@ -61,7 +61,7 @@ public class GameActions {
     }
 
     public void removeShipById(int id, Space space) throws InterruptedException {
-        List<Object[]> shipParts = space.getAll(INT, INT, new ActualField(id));
+        space.getAll(INT, INT, new ActualField(id));
     }
 
     public boolean containsShipWithId(int id, Space space) throws InterruptedException {
