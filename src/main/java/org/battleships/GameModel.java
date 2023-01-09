@@ -17,11 +17,17 @@ public class GameModel {
     };
 
     //PUBLIC
-    public void shootAt(int x,int y, Space space) throws InterruptedException {
-        space.getp(new ActualField(x),new ActualField(y),INT);
+
+    //shoot at (x,y) in space and return the id of the ship you hit, id = 0 when no shit is hit
+    public int shootAt(int x,int y, Space space) throws InterruptedException {
+        Object[] obj = space.getp(new ActualField(x),new ActualField(y),INT);
+        int id = 0;
+        if (obj != null) id = Integer.parseInt(obj[2].toString());
         space.put(x,y,0);
+        return id;
     }
 
+    //check is (x,y) is inside the board
     public boolean isInsideBoard(int x,int y){
         return !(x < 0 || x >= this.WIDTH || y < 0 || y >= this.HEIGHT);
     }

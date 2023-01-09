@@ -1,13 +1,9 @@
 package org.battleships.tests;
-
 import org.battleships.GameModel;
-import org.jspace.ActualField;
 import org.jspace.FormalField;
 import org.jspace.SequentialSpace;
 import org.jspace.Space;
 import org.junit.Test;
-
-import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 
@@ -117,7 +113,7 @@ public class TestGameModel {
 
     @Test //shoot at water
     public void testShoot1() throws InterruptedException {
-        gameModel.tryShootAt(0,0,space);
+        gameModel.shootAt(0,0,space);
         assertTrue(gameModel.hasShotAt(0,0,space));
     }
 
@@ -129,41 +125,51 @@ public class TestGameModel {
     @Test //shoot at a 1x1 ship
     public void testShoot3() throws InterruptedException {
         gameModel.tryGenerateNbyM(0,0,1,1,1,space);
-        gameModel.tryShootAt(0,0,space);
+        gameModel.shootAt(0,0,space);
         assertTrue(!gameModel.containsShipWithId(1,space));
     }
 
     @Test //miss a shot at a 1x1 ship
     public void testShoot4() throws InterruptedException {
         gameModel.tryGenerateNbyM(0,0,1,1,1,space);
-        gameModel.tryShootAt(1,0,space);
+        gameModel.shootAt(1,0,space);
         assertTrue(gameModel.containsShipWithId(1,space));
     }
 
     @Test //shoot at 2x2 ship
     public void testShoot5() throws InterruptedException {
         gameModel.tryGenerateNbyM(0,0,2,2,1,space);
-        gameModel.tryShootAt(0,0,space);
+        gameModel.shootAt(0,0,space);
         assertTrue(gameModel.containsShipWithId(1,space));
     }
 
     @Test //shoot 4 shots at a 2x2 ship
     public void testShoot6() throws InterruptedException {
         gameModel.tryGenerateNbyM(0,0,2,2,1,space);
-        gameModel.tryShootAt(0,0,space);
-        gameModel.tryShootAt(1,0,space);
-        gameModel.tryShootAt(0,1,space);
-        gameModel.tryShootAt(1,1,space);
+        gameModel.shootAt(0,0,space);
+        gameModel.shootAt(1,0,space);
+        gameModel.shootAt(0,1,space);
+        gameModel.shootAt(1,1,space);
         assertTrue(!gameModel.containsShipWithId(1,space));
     }
 
-    @Test //shoot same place multiple times
+    @Test //shoot at 1x1 ship
     public void testShoot7() throws InterruptedException {
-        gameModel.tryShootAt(0,0,space);
-        gameModel.tryShootAt(0,0,space);
-        gameModel.tryShootAt(0,0,space);
-        gameModel.tryShootAt(0,0,space);
-        List<Object[]> ls = space.queryAll(new ActualField(0),new ActualField(0),INT);
-        assertTrue(ls.size() == 1);
+        gameModel.tryGenerateNbyM(0,0,1,1,1,space);
+        int id = gameModel.shootAt(0,0,space);
+        assertTrue(id == 1);
     }
+
+    @Test //no ships left 1
+    public void testNoShips1() throws InterruptedException {
+        assertTrue(!gameModel.containsAnyShip(1,5,space));
+    }
+
+    @Test //no ships left 2
+    public void testNoShips2() throws InterruptedException {
+        gameModel.tryGenerateNbyM(0,0,1,1,1,space);
+        int id = gameModel.shootAt(0,0,space);
+        assertTrue(!gameModel.containsAnyShip(1,5,space));
+    }
+
 }
