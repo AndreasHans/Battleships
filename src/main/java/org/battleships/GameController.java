@@ -55,6 +55,7 @@ public class GameController {
             }
 
             // TODO: Setup board by placing ships
+            model.tryGenerateNbyM(2, 1, 1, 3, 1, myBoard);
 
             // Game loop
             while (true) {
@@ -66,7 +67,7 @@ public class GameController {
 
                 // Update board from opponents last move
                 Object[] opponentsMove = myBoard.queryp(new FormalField(Integer.class), new FormalField(Integer.class), new FormalField(Integer.class));
-                if (!firstMove) {
+                if (!firstMove || player == 2) {
                     targetX = Integer.parseInt(opponentsMove[0].toString());
                     targetY = Integer.parseInt(opponentsMove[1].toString());
                     if (Integer.parseInt(opponentsMove[2].toString()) == 0) {
@@ -74,7 +75,10 @@ public class GameController {
                     } else {
                         view.markHitYou(targetX, targetY);
                     }
+                } else {
+                    firstMove = false;
                 }
+
 
                 // Display updated board
                 view.BoardBuilder();
@@ -100,7 +104,7 @@ public class GameController {
                     }
 
                     // Check input is in valid range
-                    if (model.isInsideBoard(targetX, targetY)) {
+                    if (!model.isInsideBoard(targetX, targetY)) {
                         continue;
                     }
 
