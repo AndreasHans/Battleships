@@ -17,11 +17,5 @@ public class main {
         gameView.markHitYou(0,3);
         gameView.markMissYou(4,2);
         gameView.BoardBuilder();
-
-
-
-
-
-
     }
 }

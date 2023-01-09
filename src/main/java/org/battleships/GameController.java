@@ -87,7 +87,7 @@ public class GameController {
 
                 // TODO: Fire at square
                 System.out.println("Shooting");
-                model.tryShootAt(targetX, targetY, opponentBoard);
+                model.shootAt(targetX, targetY, opponentBoard);
 
                 // Display updated board
                 view.BoardBuilder();
@@ -98,8 +98,6 @@ public class GameController {
                 System.out.println("Opponents turn");
                 opponentBoard.put("token");
             }
-
-            System.out.println("Game Over");
 
         } catch (Exception e) { e.printStackTrace(); }
 

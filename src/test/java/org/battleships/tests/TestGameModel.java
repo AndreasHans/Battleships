@@ -1,9 +1,13 @@
 package org.battleships.tests;
 
 import org.battleships.GameModel;
+import org.jspace.ActualField;
+import org.jspace.FormalField;
 import org.jspace.SequentialSpace;
 import org.jspace.Space;
 import org.junit.Test;
+
+import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 
@@ -11,6 +15,7 @@ public class TestGameModel {
 
     private Space space;
     private GameModel gameModel;
+    private FormalField INT = new FormalField(Integer.class);
 
     public TestGameModel(){
         this.space = new SequentialSpace();
@@ -152,5 +157,13 @@ public class TestGameModel {
         assertTrue(!gameModel.containsShipWithId(1,space));
     }
 
-
+    @Test //shoot same place multiple times
+    public void testShoot7() throws InterruptedException {
+        gameModel.tryShootAt(0,0,space);
+        gameModel.tryShootAt(0,0,space);
+        gameModel.tryShootAt(0,0,space);
+        gameModel.tryShootAt(0,0,space);
+        List<Object[]> ls = space.queryAll(new ActualField(0),new ActualField(0),INT);
+        assertTrue(ls.size() == 1);
+    }
 }

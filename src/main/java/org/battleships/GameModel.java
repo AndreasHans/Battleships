@@ -17,12 +17,13 @@ public class GameModel {
     };
 
     //PUBLIC
-    public void tryShootAt(int x, int y, Space space) throws InterruptedException {
-        if(!isInsideBoard(x,y) || hasShotAt(x,y,space)) {
-            //try again
-        }else{
-            shootAt(x,y,space);
-        }
+    public void shootAt(int x,int y, Space space) throws InterruptedException {
+        space.getp(new ActualField(x),new ActualField(y),INT);
+        space.put(x,y,0);
+    }
+
+    public boolean isInsideBoard(int x,int y){
+        return !(x < 0 || x >= this.WIDTH || y < 0 || y >= this.HEIGHT);
     }
 
     public boolean hasShotAt(int x, int y, Space space) throws InterruptedException {
@@ -64,6 +65,13 @@ public class GameModel {
         return space.queryp(INT,INT,new ActualField(id)) != null;
     }
 
+    public boolean containsAnyShip(int minId, int maxId, Space space) throws InterruptedException {
+        for(int i = minId; i <= maxId; i++){
+            if (containsShipWithId(i,space)) return true;
+        }
+        return false;
+    }
+
     public Point[] getShipPointsById(int id, Space space) throws InterruptedException {
         ArrayList<Point> points = new ArrayList<>();
         List<Object[]> parts = space.queryAll(INT, INT, new ActualField(id));
@@ -86,11 +94,6 @@ public class GameModel {
     }
 
     //PRIVATE
-    private void shootAt(int x,int y, Space space) throws InterruptedException {
-        space.getp(new ActualField(x),new ActualField(y),INT);
-        space.put(x,y,0);
-    }
-
     private void tryGenerateShipFromList(ArrayList<Point> points, int id, Space space) throws InterruptedException {
         if(isValidShipPlacement(points,space)){
             generateShipFromList(points,id,space);
@@ -117,10 +120,6 @@ public class GameModel {
         return obj == null;
     }
 
-    private boolean isInsideBoard(int x,int y){
-        return !(x < 0 || x >= this.WIDTH || y < 0 || y >= this.HEIGHT);
-    }
-
     private boolean isValidFieldPlacement(int x, int y, Space space) throws InterruptedException {
         return isEmptyField(x,y,space) && isInsideBoard(x,y);
     }
@@ -131,5 +130,4 @@ public class GameModel {
         }
         return true;
     }
-
 }
