@@ -6,7 +6,6 @@ import org.jspace.RemoteSpace;
 import org.jspace.Space;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 
@@ -24,20 +23,20 @@ public class GameController {
     static int targetY;
     static boolean firstMove = true;
 
-    static String boardA = "tcp://82.211.207.77:1000/boardA?keep";
-    static String boardB = "tcp://82.211.207.77:1000/boardB?keep";
+    static String boardA = "tcp://192.168.1.9:1000/boardA?keep";
+    static String boardB = "tcp://192.168.1.9:1000/boardB?keep";
 
     static RemoteSpace myBoard;
     static RemoteSpace opponentBoard;
 
     static GameView view = new GameView(BOARD_SIZE, BOARD_SIZE);
     static GameModel model = new GameModel(BOARD_SIZE, BOARD_SIZE);
-
-
+    static Ship[] ships = new Ship[NUMBER_OF_SHIPS];
 
     public static void main(String[] args) {
         try {
             getPlayerNumber();
+            createShips();
             placeShips();
 
             // Game loop
@@ -72,7 +71,6 @@ public class GameController {
         opponentBoard.put("token");
     }
 
-
     public static Point getInputPoint(){
         Scanner scan = new Scanner(System.in);
         System.out.println("Type coordinates");
@@ -82,28 +80,35 @@ public class GameController {
         return p;
     }
 
-    public static void placeShip(int id) throws InterruptedException {
-        Point p;
+    public static void placeShip(Ship ship, int id) throws InterruptedException {
         do{
-            System.out.println("Give the starting point for a 1 x 3 ship");
-            p = getInputPoint();
-            model.tryGenerateNbyM(p.x, p.y, 1, 3, id, myBoard);
-        }while(!model.containsShipWithId(id,myBoard));
+            System.out.println("Give the starting point the of ship 1x3");
+            Point p = getInputPoint();
+            ship.setCenter(p);
+        }while(!model.isValidShipPlacement(ship,myBoard));
+        model.placeShip(ship,id,myBoard);
         System.out.println("Successfully placed ship!");
     }
 
-    public static void showShip(int id) throws InterruptedException {
-        ArrayList<Point> points = model.getShipPointsById(id,myBoard);
-        for(Point p: points){
+    public static void showCompleteShip(int id){
+        for(Point p: ships[id-1].getPoints()){
             view.setShipYou(p.x,p.y);
         }
         view.updateBoard();
     }
 
+    public static void createShips(){
+        for(int i = 0; i < NUMBER_OF_SHIPS; i++){
+            Ship ship = new Ship();
+            ship.setPoints(model.makeNbyM(1,3));
+            ships[i] = ship;
+        }
+    }
+
     public static void placeShips() throws InterruptedException {
-        for(int i = 1; i <= NUMBER_OF_SHIPS; i++){
-            placeShip(i);
-            showShip(i);
+        for(int i = 0; i < NUMBER_OF_SHIPS; i++){
+            placeShip(ships[i],i+1);
+            showCompleteShip(i+1);
         }
     }
 
@@ -162,9 +167,6 @@ public class GameController {
             }
         }
     }
-
-
-
 
     private static void getPlayerNumber() {
         try {
