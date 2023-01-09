@@ -29,18 +29,13 @@ public class Server {
             repository.addGate(addressA);
             repository.addGate(addressB);
 
-
             // Select player 1 and 2
             boardA.put(1);
             boardA.put(2);
 
-
-
             // Start game
             System.out.println("Starting game");
             boardA.put("token");
-
-
 
         } catch (Exception e) { }
     }

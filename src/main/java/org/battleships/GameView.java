@@ -52,7 +52,7 @@ lastly, print the board using
 
     }
 
-    public void BoardBuilder(){
+    public void updateBoard(){
         System.out.println(topLine);
         for(int i = 0; i < m; i++){//prints most of the board, each cycle printing the bottom of the field before, the top of this field, and the middle of this field
             System.out.println(bottomFieldLine);

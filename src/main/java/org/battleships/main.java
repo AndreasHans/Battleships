@@ -16,6 +16,6 @@ public class main {
         gameView.markHitEnemy(1,1);
         gameView.markHitYou(0,3);
         gameView.markMissYou(4,2);
-        gameView.BoardBuilder();
+        gameView.updateBoard();
     }
 }

@@ -3,6 +3,7 @@ package org.battleships;
 import org.jspace.ActualField;
 import org.jspace.FormalField;
 import org.jspace.RemoteSpace;
+import org.jspace.Space;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -33,6 +34,45 @@ public class GameController {
     static GameModel model = new GameModel(BOARD_SIZE, BOARD_SIZE);
 
 
+
+    public static void main(String[] args) {
+        try {
+            getPlayerNumber();
+            placeShips();
+
+            // Game loop
+            while (true) {
+                waitForTurn();
+                updatePlayerBoard();
+
+                if(hasWon(myBoard,opponent)) break;
+
+                getShotTarget();
+                shootAtTarget();
+
+                endTurn();
+
+                if(hasWon(opponentBoard,player)) break;
+
+                view.updateBoard();
+
+            }
+
+            endGame();
+
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    public static void endGame(){
+        System.out.println("Game over");
+        System.out.println(winner == player ? "You won!" : "You lost.");
+    }
+
+    public static void endTurn() throws InterruptedException {
+        opponentBoard.put("token");
+    }
+
+
     public static Point getInputPoint(){
         Scanner scan = new Scanner(System.in);
         System.out.println("Type coordinates");
@@ -57,7 +97,7 @@ public class GameController {
         for(Point p: points){
             view.setShipYou(p.x,p.y);
         }
-        view.BoardBuilder();
+        view.updateBoard();
     }
 
     public static void placeShips() throws InterruptedException {
@@ -67,93 +107,64 @@ public class GameController {
         }
     }
 
-    public static void main(String[] args) {
-        try {
-
-            // Input scanner
-            Scanner scan = new Scanner(System.in);
-
-            getPlayerNumber();
-
-            placeShips();
-
-            // Game loop
-            while (true) {
-
-                // Wait for turn
-                System.out.println("Waiting for turn...");
-                myBoard.get(new ActualField("token"));
-                System.out.println("Your turn");
-
-                updatePlayerBoard();
-
-                // Check if player won
-
-                if (!model.containsAnyShip(1, NUMBER_OF_SHIPS, myBoard)) {
-                    winner = opponent;
-                    break;
-                }
-
-                // Get target square
-                while (true) {
-
-                    // Read input
-                    try {
-                        System.out.println("Enter coordinates of target square");
-                        targetX = scan.nextInt();
-                        targetY = scan.nextInt();
-                    } catch (Exception e) {
-                        System.out.println("Invalid input");
-                        continue;
-                    }
-
-                    // Check input is in valid range
-                    if (!model.isInsideBoard(targetX, targetY)) {
-                        continue;
-                    }
-
-                    // Check square hasn't already been hit
-                    if (!model.hasShotAt(targetX, targetY, opponentBoard)) {
-                        break;
-                    }
-                }
-
-                // Fire at square
-                System.out.println("Shooting");
-                int shipId = model.shootAt(targetX, targetY, opponentBoard);
-                if (shipId == 0) {
-                    System.out.println("Miss");
-                    view.markMissEnemy(targetX, targetY);
-                } else {
-                    System.out.println("Hit");
-                    view.markHitEnemy(targetX, targetY);
-                    if (!model.containsShipWithId(shipId, opponentBoard)) {
-                        System.out.println("You sunk a ship!");
-                    }
-                }
-
-                // Display updated board
-                view.BoardBuilder();
-
-                opponentBoard.put("token");
-
-                // Check if player won
-                if (!model.containsAnyShip(1, NUMBER_OF_SHIPS, opponentBoard)) {
-                    winner = player;
-                    break;
-                }
-
-                // End turn and wait for opponent
-                System.out.println("Opponents turn");
-
-            }
-            System.out.println("Game over");
-            System.out.println(winner == player ? "You won!" : "You lost.");
-
-        } catch (Exception e) { e.printStackTrace(); }
-
-
+    public static void waitForTurn() throws InterruptedException {
+        System.out.println("Waiting for opponent...");
+        myBoard.get(new ActualField("token"));
+        System.out.println("Your turn");
     }
+
+    public static boolean hasWon(Space board, int player) throws InterruptedException {
+        boolean over = !model.containsAnyShip(1, NUMBER_OF_SHIPS, board);
+        if (over){
+            winner = player;
+        }
+        return over;
+    }
+
+    public static void getShotTarget() throws InterruptedException {
+        // Input scanner
+        Scanner scan = new Scanner(System.in);
+
+        while (true) {
+            // Read input
+            try {
+                System.out.println("Enter coordinates of target square");
+                targetX = scan.nextInt();
+                targetY = scan.nextInt();
+            } catch (Exception e) {
+                System.out.println("Invalid input");
+                continue;
+            }
+
+            // Check input is in valid range
+            if (!model.isInsideBoard(targetX, targetY)) {
+                continue;
+            }
+
+            // Check square hasn't already been hit
+            if (!model.hasShotAt(targetX, targetY, opponentBoard)) {
+                break;
+            }
+        }
+    }
+
+    public static void shootAtTarget() throws InterruptedException {
+        System.out.println("Shooting");
+        int shipId = model.shootAt(targetX, targetY, opponentBoard);
+        if (shipId == 0) {
+            System.out.println("Miss");
+            view.markMissEnemy(targetX, targetY);
+        } else {
+            System.out.println("Hit");
+            view.markHitEnemy(targetX, targetY);
+            if (!model.containsShipWithId(shipId, opponentBoard)) {
+                System.out.println("You sunk a ship!");
+            }
+        }
+    }
+
+
+
 
     private static void getPlayerNumber() {
         try {
@@ -191,9 +202,8 @@ public class GameController {
             } else {
                 firstMove = false;
             }
-
             // Display updated board
-            view.BoardBuilder();
+            view.updateBoard();
         } catch (Exception e) {
             e.printStackTrace();
         }
