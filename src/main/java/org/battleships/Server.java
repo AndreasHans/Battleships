@@ -34,6 +34,8 @@ public class Server {
             boardA.put(1);
             boardA.put(2);
 
+
+
             // Start game
             System.out.println("Starting game");
             boardA.put("token");

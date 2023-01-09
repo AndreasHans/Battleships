@@ -22,8 +22,9 @@ public class GameController {
     static int targetX;
     static int targetY;
     static boolean firstMove = true;
-    static String boardA = "tcp://192.168.1.9:1000/boardA?keep";
-    static String boardB = "tcp://192.168.1.9:1000/boardB?keep";
+
+    static String boardA = "tcp://82.211.207.77:1000/boardA?keep";
+    static String boardB = "tcp://82.211.207.77:1000/boardB?keep";
 
     static RemoteSpace myBoard;
     static RemoteSpace opponentBoard;
@@ -72,22 +73,7 @@ public class GameController {
             // Input scanner
             Scanner scan = new Scanner(System.in);
 
-            // Get player number
-            RemoteSpace space = new RemoteSpace(boardA);
-            Object[] o = space.get(new FormalField(Integer.class));
-            player = Integer.parseInt(o[0].toString());
-            System.out.println("You are player " + player);
-            if (player == 1) {
-                opponent = 2;
-                myBoard = new RemoteSpace(boardA);
-                opponentBoard = new RemoteSpace(boardB);
-            } else if (player == 2) {
-                opponent = 1;
-                myBoard = new RemoteSpace(boardB);
-                opponentBoard = new RemoteSpace(boardA);
-            } else {
-                throw new Exception("Invalid player number");
-            }
+            getPlayerNumber();
 
             placeShips();
 
@@ -99,23 +85,7 @@ public class GameController {
                 myBoard.get(new ActualField("token"));
                 System.out.println("Your turn");
 
-                // Update board from opponents last move
-                Object[] opponentsMove = myBoard.queryp(new FormalField(Integer.class), new FormalField(Integer.class), new FormalField(Integer.class));
-                if (!firstMove || player == 2) {
-                    targetX = Integer.parseInt(opponentsMove[0].toString());
-                    targetY = Integer.parseInt(opponentsMove[1].toString());
-                    if (Integer.parseInt(opponentsMove[2].toString()) == 0) {
-                        view.markMissYou(targetX, targetY);
-                    } else {
-                        view.markHitYou(targetX, targetY);
-                    }
-                } else {
-                    firstMove = false;
-                }
-
-
-                // Display updated board
-                view.BoardBuilder();
+                updatePlayerBoard();
 
                 // Check if player won
 
@@ -183,5 +153,49 @@ public class GameController {
         } catch (Exception e) { e.printStackTrace(); }
 
 
+    }
+
+    private static void getPlayerNumber() {
+        try {
+            RemoteSpace space = new RemoteSpace(boardA);
+            Object[] o = space.get(new FormalField(Integer.class));
+            player = Integer.parseInt(o[0].toString());
+            System.out.println("You are player " + player);
+            if (player == 1) {
+                opponent = 2;
+                myBoard = new RemoteSpace(boardA);
+                opponentBoard = new RemoteSpace(boardB);
+            } else if (player == 2) {
+                opponent = 1;
+                myBoard = new RemoteSpace(boardB);
+                opponentBoard = new RemoteSpace(boardA);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void updatePlayerBoard() {
+        try {
+            // Update board from opponents last move
+            Object[] opponentsMove = myBoard.queryp(new FormalField(Integer.class), new FormalField(Integer.class), new FormalField(Integer.class));
+            if (!(firstMove && player == 1)) {
+                targetX = Integer.parseInt(opponentsMove[0].toString());
+                targetY = Integer.parseInt(opponentsMove[1].toString());
+                if (Integer.parseInt(opponentsMove[2].toString()) == 0) {
+                    view.markMissYou(targetX, targetY);
+                } else {
+                    view.markHitYou(targetX, targetY);
+                }
+            } else {
+                firstMove = false;
+            }
+
+            // Display updated board
+            view.BoardBuilder();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
