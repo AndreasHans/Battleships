@@ -84,11 +84,11 @@ public class GameController {
                 view.BoardBuilder();
 
                 // Check if player won
-                /*
+
                 if (!model.containsAnyShip(1, NUMBER_OF_SHIPS, myBoard)) {
                     winner = opponent;
                     break;
-                }*/
+                }
 
                 // Get target square
                 while (true) {
@@ -123,7 +123,7 @@ public class GameController {
                 } else {
                     System.out.println("Hit");
                     view.markHitEnemy(targetX, targetY);
-                    if (model.containsShipWithId(shipId, opponentBoard)) {
+                    if (!model.containsShipWithId(shipId, opponentBoard)) {
                         System.out.println("You sunk a ship!");
                     }
                 }
@@ -131,21 +131,22 @@ public class GameController {
                 // Display updated board
                 view.BoardBuilder();
 
+                opponentBoard.put("token");
+
                 // Check if player won
-                /*
                 if (!model.containsAnyShip(1, NUMBER_OF_SHIPS, opponentBoard)) {
                     winner = player;
                     break;
-                }*/
+                }
 
                 // End turn and wait for opponent
                 System.out.println("Opponents turn");
-                opponentBoard.put("token");
+
             }
 
 
-            // System.out.println("Game over");
-            // System.out.println(winner == player ? "You won!" : "You lost.");
+            System.out.println("Game over");
+            System.out.println(winner == player ? "You won!" : "You lost.");
 
         } catch (Exception e) { e.printStackTrace(); }
 
