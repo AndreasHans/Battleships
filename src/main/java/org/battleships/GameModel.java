@@ -33,7 +33,7 @@ public class GameModel {
     }
 
     public boolean hasShotAt(int x, int y, Space space) throws InterruptedException {
-        Object[] obj = space.queryp(new ActualField(x),new ActualField(y),INT);
+        Object[] obj = space.queryp(new ActualField(x),new ActualField(y), new FormalField(Integer.class));
         return obj != null && Integer.parseInt(obj[2].toString()) == 0;
     }
 

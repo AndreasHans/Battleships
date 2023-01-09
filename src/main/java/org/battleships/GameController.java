@@ -11,9 +11,16 @@ import java.util.Scanner;
 public class GameController {
 
     static int BOARD_SIZE = 5;
+    static int NUMBER_OF_SHIPS = 3;
 
     // Variable that store whether you are player 1 or 2
     static int player;
+    static int opponent;
+    static int winner;
+    static int targetX;
+    static int targetY;
+
+    static boolean firstMove = true;
 
     static String boardA = "tcp://82.211.207.77:1000/boardA?keep";
     static String boardB = "tcp://82.211.207.77:1000/boardB?keep";
@@ -36,9 +43,11 @@ public class GameController {
             player = Integer.parseInt(o[0].toString());
             System.out.println("You are player " + player);
             if (player == 1) {
+                opponent = 2;
                 myBoard = new RemoteSpace(boardA);
                 opponentBoard = new RemoteSpace(boardB);
             } else if (player == 2) {
+                opponent = 1;
                 myBoard = new RemoteSpace(boardB);
                 opponentBoard = new RemoteSpace(boardA);
             } else {
@@ -55,13 +64,29 @@ public class GameController {
                 myBoard.get(new ActualField("token"));
                 System.out.println("Your turn");
 
+                // Update board from opponents last move
+                Object[] opponentsMove = myBoard.queryp(new FormalField(Integer.class), new FormalField(Integer.class), new FormalField(Integer.class));
+                if (!firstMove) {
+                    targetX = Integer.parseInt(opponentsMove[0].toString());
+                    targetY = Integer.parseInt(opponentsMove[1].toString());
+                    if (Integer.parseInt(opponentsMove[2].toString()) == 0) {
+                        view.markMissYou(targetX, targetY);
+                    } else {
+                        view.markHitYou(targetX, targetY);
+                    }
+                }
+
                 // Display updated board
                 view.BoardBuilder();
 
-                // TODO: Check if opponent won
+                // Check if player won
+                /*
+                if (!model.containsAnyShip(1, NUMBER_OF_SHIPS, myBoard)) {
+                    winner = opponent;
+                    break;
+                }*/
 
                 // Get target square
-                int targetX = 0, targetY = 0;
                 while (true) {
 
                     // Read input
@@ -75,7 +100,7 @@ public class GameController {
                     }
 
                     // Check input is in valid range
-                    if (!(targetX >= 0 && targetX < BOARD_SIZE && targetY >= 0 && targetY < BOARD_SIZE)) {
+                    if (model.isInsideBoard(targetX, targetY)) {
                         continue;
                     }
 
@@ -85,19 +110,38 @@ public class GameController {
                     }
                 }
 
-                // TODO: Fire at square
+                // Fire at square
                 System.out.println("Shooting");
-                model.shootAt(targetX, targetY, opponentBoard);
+                int shipId = model.shootAt(targetX, targetY, opponentBoard);
+                if (shipId == 0) {
+                    System.out.println("Miss");
+                    view.markMissEnemy(targetX, targetY);
+                } else {
+                    System.out.println("Hit");
+                    view.markHitEnemy(targetX, targetY);
+                    if (model.containsShipWithId(shipId, opponentBoard)) {
+                        System.out.println("You sunk a ship!");
+                    }
+                }
 
                 // Display updated board
                 view.BoardBuilder();
 
-                // TODO: Check if player won
+                // Check if player won
+                /*
+                if (!model.containsAnyShip(1, NUMBER_OF_SHIPS, opponentBoard)) {
+                    winner = player;
+                    break;
+                }*/
 
                 // End turn and wait for opponent
                 System.out.println("Opponents turn");
                 opponentBoard.put("token");
             }
+
+
+            // System.out.println("Game over");
+            // System.out.println(winner == player ? "You won!" : "You lost.");
 
         } catch (Exception e) { e.printStackTrace(); }
 
