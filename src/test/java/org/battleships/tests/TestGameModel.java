@@ -160,6 +160,13 @@ public class TestGameModel {
         assertTrue(id == 1);
     }
 
+    @Test //shoot at ship
+    public void testShoot8() throws InterruptedException {
+        gameModel.tryGenerateNbyM(0,0,1,1,1,space);
+        gameModel.shootAt(0,0,space);
+        assertTrue(gameModel.hasShotAt(0,0,space));
+    }
+
     @Test //no ships left 1
     public void testNoShips1() throws InterruptedException {
         assertTrue(!gameModel.containsAnyShip(1,5,space));

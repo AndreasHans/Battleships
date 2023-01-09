@@ -15,15 +15,13 @@ public class GameModel {
         this.HEIGHT = height;
         this.WIDTH = width;
     };
-
     //PUBLIC
-
     //shoot at (x,y) in space and return the id of the ship you hit, id = 0 when no shit is hit
     public int shootAt(int x,int y, Space space) throws InterruptedException {
         Object[] obj = space.getp(new ActualField(x),new ActualField(y),INT);
         int id = 0;
         if (obj != null) id = Integer.parseInt(obj[2].toString());
-        space.put(x,y,0);
+        space.put(x,y,-id);
         return id;
     }
 
@@ -33,8 +31,8 @@ public class GameModel {
     }
 
     public boolean hasShotAt(int x, int y, Space space) throws InterruptedException {
-        Object[] obj = space.queryp(new ActualField(x),new ActualField(y), new FormalField(Integer.class));
-        return obj != null && Integer.parseInt(obj[2].toString()) == 0;
+        Object[] obj = space.queryp(new ActualField(x),new ActualField(y),INT);
+        return obj != null && Integer.parseInt(obj[2].toString()) <= 0;
     }
 
     public void tryGenerateNbyM(int x0, int y0, int n, int m, int id, Space space) throws InterruptedException {
