@@ -21,8 +21,8 @@ public class Server {
             repository.add("boardB", boardB);
 
             // Set URI
-            String addressA = "tcp://82.211.207.77:1000/boardA?keep";
-            String addressB = "tcp://82.211.207.77:1000/boardB?keep";
+            String addressA = "tcp://192.168.1.9:1000/boardA?keep";
+            String addressB = "tcp://192.168.1.9:1000/boardB?keep";
 
             // Open gates
             System.out.println("Opening gates");

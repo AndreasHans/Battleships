@@ -76,8 +76,8 @@ public class GameModel {
         return false;
     }
 
-    public Point[] getShipPointsById(int id, Space space) throws InterruptedException {
-        ArrayList<Point> points = new ArrayList<>();
+    public ArrayList<Point> getShipPointsById(int id, Space space) throws InterruptedException {
+        ArrayList<Point> points = new ArrayList<Point>();
         List<Object[]> parts = space.queryAll(INT, INT, new ActualField(id));
 
         for(Object[] obj: parts){
@@ -85,7 +85,7 @@ public class GameModel {
             int y = Integer.parseInt(obj[1].toString());
             points.add(new Point(x,y));
         }
-        return (Point[]) points.toArray();
+        return points;
     }
 
     public void printElemsInSpaceById(Space space, int id) throws InterruptedException {

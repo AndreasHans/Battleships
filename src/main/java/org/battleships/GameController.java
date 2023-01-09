@@ -4,6 +4,8 @@ import org.jspace.ActualField;
 import org.jspace.FormalField;
 import org.jspace.RemoteSpace;
 
+import java.awt.*;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 
@@ -19,17 +21,50 @@ public class GameController {
     static int winner;
     static int targetX;
     static int targetY;
-
     static boolean firstMove = true;
-
-    static String boardA = "tcp://82.211.207.77:1000/boardA?keep";
-    static String boardB = "tcp://82.211.207.77:1000/boardB?keep";
+    static String boardA = "tcp://192.168.1.9:1000/boardA?keep";
+    static String boardB = "tcp://192.168.1.9:1000/boardB?keep";
 
     static RemoteSpace myBoard;
     static RemoteSpace opponentBoard;
 
     static GameView view = new GameView(BOARD_SIZE, BOARD_SIZE);
     static GameModel model = new GameModel(BOARD_SIZE, BOARD_SIZE);
+
+
+    public static Point getInputPoint(){
+        Scanner scan = new Scanner(System.in);
+        System.out.println("Type coordinates");
+        Point p = new Point();
+        p.x = scan.nextInt();
+        p.y = scan.nextInt();
+        return p;
+    }
+
+    public static void placeShip(int id) throws InterruptedException {
+        Point p;
+        do{
+            System.out.println("Give the starting point for a 1 x 3 ship");
+            p = getInputPoint();
+            model.tryGenerateNbyM(p.x, p.y, 1, 3, id, myBoard);
+        }while(!model.containsShipWithId(id,myBoard));
+        System.out.println("Successfully placed ship!");
+    }
+
+    public static void showShip(int id) throws InterruptedException {
+        ArrayList<Point> points = model.getShipPointsById(id,myBoard);
+        for(Point p: points){
+            view.setShipYou(p.x,p.y);
+        }
+        view.BoardBuilder();
+    }
+
+    public static void placeShips() throws InterruptedException {
+        for(int i = 1; i <= NUMBER_OF_SHIPS; i++){
+            placeShip(i);
+            showShip(i);
+        }
+    }
 
     public static void main(String[] args) {
         try {
@@ -54,8 +89,7 @@ public class GameController {
                 throw new Exception("Invalid player number");
             }
 
-            // TODO: Setup board by placing ships
-            model.tryGenerateNbyM(2, 1, 1, 3, 1, myBoard);
+            placeShips();
 
             // Game loop
             while (true) {
@@ -143,8 +177,6 @@ public class GameController {
                 System.out.println("Opponents turn");
 
             }
-
-
             System.out.println("Game over");
             System.out.println(winner == player ? "You won!" : "You lost.");
 
