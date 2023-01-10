@@ -6,6 +6,8 @@ import org.jspace.Space;
 public class main {
 
     public static void main(String[] argv) throws InterruptedException {
+
+        /*
         Space ships = new SequentialSpace();
         GameModel gameModel = new GameModel(5,5);
 
@@ -17,5 +19,6 @@ public class main {
         gameView.markHitYou(0,3);
         gameView.markMissYou(4,2);
         gameView.updateBoard();
+        */
     }
 }
