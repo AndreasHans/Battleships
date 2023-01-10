@@ -81,10 +81,12 @@ public class GameController {
     }
 
     public static void placeShip(Ship ship, int id) throws InterruptedException {
-        System.out.println("You are about to place " + ship);
-        doRotations(ship);
-        System.out.println("The final template is " + ship);
+        System.out.println("You are about to place the following ship");
 
+        ship.setCenter(new Point(2,2));
+        view.preview(ship.getActualPoints());
+
+        doRotations(ship);
         do{
             Point p = getInputPoint();
             ship.setCenter(p);
@@ -102,6 +104,7 @@ public class GameController {
             else if (r.equalsIgnoreCase("rotate")){
                 ship.rotate();
                 System.out.println("Ship successfully rotated");
+                view.preview(ship.getActualPoints());
             }
         }
     }
