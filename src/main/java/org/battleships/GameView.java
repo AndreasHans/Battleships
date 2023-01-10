@@ -1,10 +1,14 @@
 package org.battleships;
 
+import java.awt.*;
+import java.util.ArrayList;
+
 public class GameView {
     public int n = 5;//how wide the board is, or in other words, how many x positions
     public int m = 5;//how tall the board is, or in other words, how many y positions
     private char[][] boardEnemy = new char[n][m];
     private char[][] boardYou = new char[n][m];
+    private char[][] boardPreview = new char[n][m];
 
     private final String fieldBottom = "___|";
     private final String fieldTop = "   |";
@@ -34,11 +38,13 @@ lastly, print the board using
         n = x;
         m = y;
         boardEnemy = new char[n][m];
-        boardYou= new char[n][m];
+        boardYou = new char[n][m];
+        boardPreview = new char[n][m];
 
         //fills the board with empty spaces
         setUpEnemy();
         setUpYou();
+        setUpPreview();
         //readies the top field line
         topFieldBuilder();
         topFieldLine.append(spacing);
@@ -75,6 +81,39 @@ lastly, print the board using
         System.out.println();
         System.out.println();
         System.out.println();
+    }
+
+    public void preview(ArrayList<Point> coordinates){
+        for(int i = 0; i < coordinates.size(); i++){
+            boardPreview[coordinates.get(i).x][coordinates.get(i).y] = 'x';
+        }
+
+        System.out.println(topLine);
+        for(int i = 0; i < m; i++){//prints most of the board, each cycle printing the bottom of the field before, the top of this field, and the middle of this field
+            System.out.println(bottomFieldLine);
+            System.out.println(topFieldLine);
+
+            //build the middle of the field start
+            StringBuilder currentLine = new StringBuilder(fieldLeft);
+            currentLine.append(i).append(fieldRight);
+            for(int j = 0; j < n; j++){//intputs the right chars in enemy board
+                currentLine.append(fieldLeft).append(boardPreview[j][i]).append(fieldRight);
+            }
+            currentLine.append(spacing).append(fieldLeft).append(i).append(fieldRight);
+            for(int j= 0; j < n; j++){
+                currentLine.append(fieldLeft).append(boardYou[j][i]).append(fieldRight);
+            }//build the middle of the field end
+
+            System.out.println(currentLine);
+        }
+        System.out.println(bottomFieldLine);
+        System.out.println();
+        System.out.println();
+        System.out.println();
+
+
+
+
     }
 
     public void setShipYou(int x, int y){//for placing ships
@@ -133,6 +172,14 @@ lastly, print the board using
         for(int i = 0; i < n; i++){
             for(int j = 0; j < m; j++){
                 boardYou[i][j] = ' ';
+            }
+        }
+    }
+
+    private void setUpPreview() {
+        for(int i = 0; i < n; i++){
+            for(int j = 0; j < m; j++){
+                boardPreview[i][j] = ' ';
             }
         }
     }
