@@ -22,7 +22,7 @@ public class GameController {
     static boolean firstMove = true;
     static boolean gameNotFound = true;
 
-    static String ip = "192.168.1.9";
+    static String ip = "192.168.1.4";
     static String serverPort = "1000";
     static String playerPort;
     static String opponentPort;
@@ -44,6 +44,7 @@ public class GameController {
             placeShips();
 
             if (player == 2) opponentBoard.put("token");
+            view.updateBoard();
 
             // Game loop
             while (true) {
@@ -203,11 +204,10 @@ public class GameController {
         }
     }
 
-    public static void showCompleteShip(int id){
+    public static void setCompleteShip(int id){
         for(Point p: ships[id-1].getActualPoints()){
             view.setShipYou(p.x,p.y);
         }
-        view.updateBoard();
     }
 
     public static ArrayList<Point> getShip(int i){
@@ -235,7 +235,7 @@ public class GameController {
     public static void placeShips() throws InterruptedException {
         for(int i = 0; i < NUMBER_OF_SHIPS; i++){
             placeShip(ships[i],i+1);
-            showCompleteShip(i+1);
+            setCompleteShip(i+1);
         }
     }
 

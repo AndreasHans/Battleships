@@ -15,10 +15,15 @@ public class GameView {
     private final String fieldLeft = " ";
     private final String fieldRight = " |";
     private final String spacing = "      |";
+    private final String tagLineSpacing = "       You ";
+    private final String tagLineField = "    ";
 
     private StringBuilder bottomFieldLine = new StringBuilder("");
     private StringBuilder topFieldLine = new StringBuilder("");
     private StringBuilder topLine = new StringBuilder("   |");
+    private StringBuilder EnemeyTagLine = new StringBuilder("Enemy   ");
+    private StringBuilder PreviewTagLine = new StringBuilder("Preview ");
+
 /*
 USER MANUAL: first, create a gameView object with a n times m board
     GameView gameView = new GameView(n,m);
@@ -31,6 +36,8 @@ Then, use the following to change the board
 with you being the right board, where your ships are located, and enemy being the left, where you shoot
 lastly, print the board using
     gameView.BoardBuilder();
+
+    preview requires only step 1, and to call preview with an arraylist of points you want previewed.
     */
 
 
@@ -55,10 +62,16 @@ lastly, print the board using
         bottomFieldBuilder();
         //readies the top line
         topLineBuilder();
+        //readies the tagline
+        tagLineBilder();
 
     }
 
+
+
     public void updateBoard(){
+        System.out.println();
+        System.out.println(EnemeyTagLine);
         System.out.println(topLine);
         for(int i = 0; i < m; i++){//prints most of the board, each cycle printing the bottom of the field before, the top of this field, and the middle of this field
             System.out.println(bottomFieldLine);
@@ -90,6 +103,8 @@ lastly, print the board using
             boardPreview[coordinates.get(i).x][coordinates.get(i).y] = 'x';
         }
 
+        System.out.println();
+        System.out.println(PreviewTagLine);
         System.out.println(topLine);
         for(int i = 0; i < m; i++){//prints most of the board, each cycle printing the bottom of the field before, the top of this field, and the middle of this field
             System.out.println(bottomFieldLine);
@@ -112,10 +127,6 @@ lastly, print the board using
         System.out.println();
         System.out.println();
         System.out.println();
-
-
-
-
     }
 
     public void setShipYou(int x, int y){//for placing ships
@@ -160,6 +171,20 @@ lastly, print the board using
             bottomFieldLine.append(fieldBottom);
         }
     }
+
+    private void tagLineBilder() {
+        for(int i = 0; i < n-1; i++){
+            PreviewTagLine.append(tagLineField);
+            EnemeyTagLine.append(tagLineField);
+        }
+        PreviewTagLine.append(tagLineSpacing);
+        EnemeyTagLine.append(tagLineSpacing);
+        for(int i = 0; i < n; i++){
+            PreviewTagLine.append(tagLineField);
+            EnemeyTagLine.append(tagLineField);
+        }
+    }
+
 
 
     private void setUpEnemy(){//ensure the enemy board is empty
