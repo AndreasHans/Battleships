@@ -1,14 +1,11 @@
 package org.battleships;
 
-import org.jspace.ActualField;
-import org.jspace.FormalField;
-import org.jspace.RemoteSpace;
-import org.jspace.Space;
+import org.jspace.*;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.io.IOException;
 import java.util.Scanner;
-
 
 
 public class GameController {
@@ -23,12 +20,18 @@ public class GameController {
     static int targetX;
     static int targetY;
     static boolean firstMove = true;
+    static boolean gameNotFound = true;
 
-    static String boardA = "tcp://192.168.1.9:1000/boardA?keep";
-    static String boardB = "tcp://192.168.1.9:1000/boardB?keep";
+    static String ip = "82.211.207.77";
+    static String serverPort = "1000";
+    static String playerPort;
+    static String opponentPort;
+    static String playerId;
 
-    static RemoteSpace myBoard;
+    static RemoteSpace lobby;
     static RemoteSpace opponentBoard;
+    static Space myBoard;
+    static SpaceRepository repository;
 
     static GameView view = new GameView(BOARD_SIZE, BOARD_SIZE);
     static GameModel model = new GameModel(BOARD_SIZE, BOARD_SIZE);
@@ -36,9 +39,11 @@ public class GameController {
 
     public static void main(String[] args) {
         try {
-            getPlayerNumber();
+            findGame();
             createShips();
             placeShips();
+
+            if (player == 2) opponentBoard.put("token");
 
             // Game loop
             while (true) {
@@ -61,6 +66,97 @@ public class GameController {
             endGame();
 
         } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    private static void findGame() throws IOException, InterruptedException {
+
+        playerId = generatePlayerId();
+        playerPort = generatePort();
+        lobby = new RemoteSpace("tcp://" + ip + ":" + serverPort + "/lobby?keep");
+
+        // Create space for own board
+        myBoard = new PileSpace();
+        repository = new SpaceRepository();
+        repository.add(playerId, myBoard);
+        repository.addGate("tcp://" + ip + ":" + playerPort + "/?keep");
+
+        Scanner scan = new Scanner(System.in);
+        while (gameNotFound) {
+            System.out.println("Type create or join");
+            String choice = scan.nextLine().trim();
+            if (choice.equalsIgnoreCase("create")) {
+                createGame();
+            } else if (choice.equalsIgnoreCase("join")) {
+                joinGame();
+            }
+        }
+        System.out.println("Game start");
+    }
+
+    private static void joinGame() throws InterruptedException, IOException {
+        Scanner scan = new Scanner(System.in);
+        while (gameNotFound) {
+            System.out.println("Enter id:"); // Consider adding option to go back to select join or create
+            String input = scan.nextLine().trim();
+
+            Object[] tuple = lobby.getp(new ActualField(input), new FormalField(String.class));
+            if (tuple != null) {
+                String opponentId = tuple[0].toString();
+                opponentPort = tuple[1].toString();
+                opponentBoard = new RemoteSpace("tcp://" + ip + ":" + opponentPort + "/" + opponentId + "?keep");
+                opponentBoard.put(playerId, playerPort);
+                assignPlayerNumber(2);
+                gameNotFound = false;
+            } else {
+                System.out.println("Could not find player with id: " + input);
+            }
+        }
+    }
+
+    private static void createGame() throws InterruptedException, IOException {
+        System.out.println("Your player id: " + playerId);
+        lobby.put(playerId, playerPort);
+
+        // Wait for other player to connect
+        Object[] tuple = myBoard.get(new FormalField(String.class), new FormalField(String.class));
+        String opponentId = tuple[0].toString();
+        opponentPort = tuple[1].toString();
+
+        opponentBoard = new RemoteSpace("tcp://" + ip + ":" + opponentPort + "/" + opponentId + "?keep");
+
+        // Start game
+        assignPlayerNumber(1);
+        System.out.println("assigned player number: " + player);
+        gameNotFound = false;
+    }
+
+    private static String generatePlayerId() {
+        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        while (true) {
+            String id = "";
+            for (int i = 0; i < 5; i++) {
+                int index = (int) (alphabet.length() * Math.random());
+                id = id + alphabet.charAt(index);
+            }
+            return id;
+        }
+    }
+
+    private static String generatePort() {
+        String alphabet = "0123456789";
+        while (true) {
+            String port = "";
+            for (int i = 0; i < 4; i++) {
+                int index = (int) (alphabet.length() * Math.random());
+                port = port + alphabet.charAt(index);
+            }
+            return port;
+        }
+    }
+
+    private static void assignPlayerNumber(int number) {
+        player = number;
+        opponent = player == 1 ? 2 : 1;
     }
 
     public static void endGame(){
@@ -196,27 +292,6 @@ public class GameController {
             if (!model.containsShipWithId(shipId, opponentBoard)) {
                 System.out.println("You sunk a ship!");
             }
-        }
-    }
-
-    private static void getPlayerNumber() {
-        try {
-            RemoteSpace space = new RemoteSpace(boardA);
-            Object[] o = space.get(new FormalField(Integer.class));
-            player = Integer.parseInt(o[0].toString());
-            System.out.println("You are player " + player);
-            if (player == 1) {
-                opponent = 2;
-                myBoard = new RemoteSpace(boardA);
-                opponentBoard = new RemoteSpace(boardB);
-            } else if (player == 2) {
-                opponent = 1;
-                myBoard = new RemoteSpace(boardB);
-                opponentBoard = new RemoteSpace(boardA);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 

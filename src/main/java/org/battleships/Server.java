@@ -1,39 +1,20 @@
 package org.battleships;
 
-import org.jspace.Space;
-import org.jspace.PileSpace;
-import org.jspace.SpaceRepository;
+import org.jspace.*;
 
 public class Server {
 
-    public static void main(String[] args) {
-        try {
+    public static String ip = "82.211.207.77";
+    public static String port = "1000";
 
-            SpaceRepository repository = new SpaceRepository();
+    public static void main(String[] args) throws InterruptedException {
 
-            Space boardA = new PileSpace();
-            Space boardB = new PileSpace();
+        SpaceRepository repository = new SpaceRepository();
+        Space lobby = new SequentialSpace();
+        repository.add("lobby", lobby);
 
-            repository.add("boardA", boardA);
-            repository.add("boardB", boardB);
+        repository.addGate("tcp://" + ip + ":" + port + "/lobby?keep");
+        System.out.println("Lobby open");
 
-            // Set URI
-            String addressA = "tcp://192.168.1.9:1000/boardA?keep";
-            String addressB = "tcp://192.168.1.9:1000/boardB?keep";
-
-            // Open gates
-            System.out.println("Opening gates");
-            repository.addGate(addressA);
-            repository.addGate(addressB);
-
-            // Select player 1 and 2
-            boardA.put(1);
-            boardA.put(2);
-
-            // Start game
-            System.out.println("Starting game");
-            boardA.put("token");
-
-        } catch (Exception e) { }
     }
 }
