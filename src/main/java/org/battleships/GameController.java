@@ -6,6 +6,7 @@ import org.jspace.RemoteSpace;
 import org.jspace.Space;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 
@@ -72,9 +73,9 @@ public class GameController {
     }
 
     public static Point getInputPoint(){
-        System.out.println("Give the point where you want to place the ship in the format: x y");
         Scanner scan = new Scanner(System.in);
         Point p = new Point();
+        System.out.println("Give the point where you want to place the ship in the format: x y");
         p.x = scan.nextInt();
         p.y = scan.nextInt();
         return p;
@@ -82,10 +83,7 @@ public class GameController {
 
     public static void placeShip(Ship ship, int id) throws InterruptedException {
         System.out.println("You are about to place the following ship");
-
-        ship.setCenter(new Point(2,2));
-        view.preview(ship.getActualPoints());
-
+        view.preview(ship.getPreviewPoints(BOARD_SIZE));
         doRotations(ship);
         do{
             Point p = getInputPoint();
@@ -97,14 +95,14 @@ public class GameController {
 
     public static void doRotations(Ship ship){
         Scanner scan = new Scanner(System.in);
-        System.out.println("Do you want to rotate the ship 90 degrees clockwise?\nType rotate to rotate, type ok when done");
         while(true){
+            System.out.println("Do you want to rotate the ship 90 degrees clockwise?\nType rotate to rotate, type ok when done");
             String r = scan.next();
             if(r.equalsIgnoreCase("ok")) break;
             else if (r.equalsIgnoreCase("rotate")){
                 ship.rotate();
                 System.out.println("Ship successfully rotated");
-                view.preview(ship.getActualPoints());
+                view.preview(ship.getPreviewPoints(BOARD_SIZE));
             }
         }
     }
@@ -116,10 +114,24 @@ public class GameController {
         view.updateBoard();
     }
 
+    public static ArrayList<Point> getShip(int i){
+        switch (i){
+            case 0:
+                return model.makeNbyM(2,1); // 2 x 1
+            case 1:
+                return model.makeL(); // L = (1 x 3 + 1 x 2)
+            case 2:
+                return model.makeNbyM(1,3); // 1 x 3
+            default:
+                return model.makeNbyM(1,1); // 1 x 1
+        }
+    }
+
+
     public static void createShips(){
         for(int i = 0; i < NUMBER_OF_SHIPS; i++){
             Ship ship = new Ship();
-            ship.setTemplatePoints(model.makeNbyM(1,3));
+            ship.setTemplatePoints(getShip(i));
             ships[i] = ship;
         }
     }

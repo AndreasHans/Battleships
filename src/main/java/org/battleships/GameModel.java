@@ -43,6 +43,18 @@ public class GameModel {
         return points;
     }
 
+    public ArrayList<Point> makeL(){
+
+        ArrayList<Point> points = new ArrayList<>();
+        for(int i = 0; i < 3; i++){
+            points.add(new Point(0,i));
+        }
+        for(int i = 1; i < 2; i++){
+            points.add(new Point(i,2));
+        }
+        return points;
+    }
+
     public boolean containsShipWithId(int id, Space space) throws InterruptedException {
         return space.queryp(INT,INT,new ActualField(id)) != null;
     }

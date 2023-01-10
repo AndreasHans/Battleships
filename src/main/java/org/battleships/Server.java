@@ -4,9 +4,6 @@ import org.jspace.Space;
 import org.jspace.PileSpace;
 import org.jspace.SpaceRepository;
 
-import java.net.URI;
-
-
 public class Server {
 
     public static void main(String[] args) {
