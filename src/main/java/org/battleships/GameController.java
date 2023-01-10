@@ -22,7 +22,9 @@ public class GameController {
     static boolean firstMove = true;
     static boolean gameNotFound = true;
 
-    static String ip = "192.168.1.4";
+    static String serverIp = "10.209.126.122";
+    static String playerIp = "10.209.126.122";
+    static String opponentIp = "";
     static String serverPort = "1000";
     static String playerPort;
     static String opponentPort;
@@ -73,13 +75,13 @@ public class GameController {
 
         playerId = generatePlayerId();
         playerPort = generatePort();
-        lobby = new RemoteSpace("tcp://" + ip + ":" + serverPort + "/lobby?keep");
+        lobby = new RemoteSpace("tcp://" + serverIp + ":" + serverPort + "/lobby?keep");
 
         // Create space for own board
         myBoard = new PileSpace();
         repository = new SpaceRepository();
         repository.add(playerId, myBoard);
-        repository.addGate("tcp://" + ip + ":" + playerPort + "/?keep");
+        repository.addGate("tcp://" + playerIp + ":" + playerPort + "/?keep");
 
         Scanner scan = new Scanner(System.in);
         while (gameNotFound) {
@@ -100,12 +102,13 @@ public class GameController {
             System.out.println("Enter id:"); // Consider adding option to go back to select join or create
             String input = scan.nextLine().trim();
 
-            Object[] tuple = lobby.getp(new ActualField(input), new FormalField(String.class));
+            Object[] tuple = lobby.getp(new ActualField(input), new FormalField(String.class), new FormalField(String.class));
             if (tuple != null) {
                 String opponentId = tuple[0].toString();
-                opponentPort = tuple[1].toString();
-                opponentBoard = new RemoteSpace("tcp://" + ip + ":" + opponentPort + "/" + opponentId + "?keep");
-                opponentBoard.put(playerId, playerPort);
+                opponentIp = tuple[1].toString();
+                opponentPort = tuple[2].toString();
+                opponentBoard = new RemoteSpace("tcp://" + opponentIp + ":" + opponentPort + "/" + opponentId + "?keep");
+                opponentBoard.put(playerId, playerIp, playerPort);
                 assignPlayerNumber(2);
                 gameNotFound = false;
             } else {
@@ -116,14 +119,15 @@ public class GameController {
 
     private static void createGame() throws InterruptedException, IOException {
         System.out.println("Your player id: " + playerId);
-        lobby.put(playerId, playerPort);
+        lobby.put(playerId, playerIp, playerPort);
 
         // Wait for other player to connect
-        Object[] tuple = myBoard.get(new FormalField(String.class), new FormalField(String.class));
+        Object[] tuple = myBoard.get(new FormalField(String.class), new FormalField(String.class), new FormalField(String.class));
         String opponentId = tuple[0].toString();
-        opponentPort = tuple[1].toString();
+        opponentIp = tuple[1].toString();
+        opponentPort = tuple[2].toString();
 
-        opponentBoard = new RemoteSpace("tcp://" + ip + ":" + opponentPort + "/" + opponentId + "?keep");
+        opponentBoard = new RemoteSpace("tcp://" + opponentIp + ":" + opponentPort + "/" + opponentId + "?keep");
 
         // Start game
         assignPlayerNumber(1);

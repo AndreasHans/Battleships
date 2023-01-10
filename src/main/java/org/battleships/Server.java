@@ -2,7 +2,7 @@ package org.battleships;
 import org.jspace.*;
 public class Server {
 
-    public static String ip = "192.168.1.9";
+    public static String ip = "10.209.126.122";
     public static String port = "1000";
 
     public static void main(String[] args) {
