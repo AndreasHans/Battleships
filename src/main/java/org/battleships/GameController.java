@@ -72,8 +72,8 @@ public class GameController {
     }
 
     public static Point getInputPoint(){
+        System.out.println("Give the point where you want to place the ship in the format: x y");
         Scanner scan = new Scanner(System.in);
-        System.out.println("Type coordinates");
         Point p = new Point();
         p.x = scan.nextInt();
         p.y = scan.nextInt();
@@ -81,8 +81,11 @@ public class GameController {
     }
 
     public static void placeShip(Ship ship, int id) throws InterruptedException {
+        System.out.println("You are about to place " + ship);
+        doRotations(ship);
+        System.out.println("The final template is " + ship);
+
         do{
-            System.out.println("Give the starting point the of ship 1x3");
             Point p = getInputPoint();
             ship.setCenter(p);
         }while(!model.isValidShipPlacement(ship,myBoard));
@@ -90,8 +93,21 @@ public class GameController {
         System.out.println("Successfully placed ship!");
     }
 
+    public static void doRotations(Ship ship){
+        Scanner scan = new Scanner(System.in);
+        System.out.println("Do you want to rotate the ship 90 degrees clockwise?\nType rotate to rotate, type ok when done");
+        while(true){
+            String r = scan.next();
+            if(r.equalsIgnoreCase("ok")) break;
+            else if (r.equalsIgnoreCase("rotate")){
+                ship.rotate();
+                System.out.println("Ship successfully rotated");
+            }
+        }
+    }
+
     public static void showCompleteShip(int id){
-        for(Point p: ships[id-1].getPoints()){
+        for(Point p: ships[id-1].getActualPoints()){
             view.setShipYou(p.x,p.y);
         }
         view.updateBoard();
@@ -100,7 +116,7 @@ public class GameController {
     public static void createShips(){
         for(int i = 0; i < NUMBER_OF_SHIPS; i++){
             Ship ship = new Ship();
-            ship.setPoints(model.makeNbyM(1,3));
+            ship.setTemplatePoints(model.makeNbyM(1,3));
             ships[i] = ship;
         }
     }

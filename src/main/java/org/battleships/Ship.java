@@ -12,33 +12,40 @@ public class Ship {
     }
 
     public void setCenter(Point c2){
-        int dx = c2.x - c.x;
-        int dy = c2.y - c.y;
-        for(Point p: this.points){
-            p.x += dx;
-            p.y += dy;
-        }
         this.c = c2;
     }
 
-    //does not fully work
-    /*
-    public void rotate(){
-        for(Point p: this.points){
-            int tmp = p.x;
-            p.x = c.x+c.y-p.y;
-            p.y = tmp+c.y-c.x;
-        }
-    }
-
-     */
-
-    public void setPoints(ArrayList<Point> points){
+    public void setTemplatePoints(ArrayList<Point> points){
         this.points = points;
     }
 
-    public ArrayList<Point> getPoints(){
+    public ArrayList<Point> getTemplatePoints(){
         return this.points;
+    }
+
+    public ArrayList<Point> getActualPoints(){
+        ArrayList<Point> points = new ArrayList<>();
+        for(Point p: this.points){
+            points.add(new Point(p.x+c.x,p.y+c.y));
+        }
+        return points;
+    }
+
+    public void rotate(){
+        for(Point p: this.points){
+            int tmp = p.x;
+            p.x = -p.y;
+            p.y = tmp;
+        }
+    }
+
+    public String toString(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("a ship with template points");
+        for(Point p: points){
+            sb.append(" (").append(p.x).append(",").append(p.y).append(")");
+        }
+        return sb.toString();
     }
 
 }

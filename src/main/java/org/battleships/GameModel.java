@@ -55,14 +55,14 @@ public class GameModel {
     }
 
     public boolean isValidShipPlacement(Ship ship, Space space) throws InterruptedException {
-        for(Point p: ship.getPoints()){
+        for(Point p: ship.getActualPoints()){
             if (!isValidFieldPlacement(p.x,p.y,space)) return false;
         }
         return true;
     }
 
     public void placeShip(Ship ship, int id, Space myBoard) throws InterruptedException {
-        for(Point p: ship.getPoints()){
+        for(Point p: ship.getActualPoints()){
             myBoard.put(p.x,p.y,id);
         }
     }
