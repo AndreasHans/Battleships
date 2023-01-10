@@ -22,7 +22,7 @@ public class GameController {
     static boolean firstMove = true;
     static boolean gameNotFound = true;
 
-    static String ip = "82.211.207.77";
+    static String ip = "192.168.1.9";
     static String serverPort = "1000";
     static String playerPort;
     static String opponentPort;
