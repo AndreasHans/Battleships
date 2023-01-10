@@ -84,7 +84,9 @@ lastly, print the board using
     }
 
     public void preview(ArrayList<Point> coordinates){
-        for(int i = 0; i < coordinates.size(); i++){
+        setUpPreview();
+        boardPreview[coordinates.get(0).x][coordinates.get(0).y] = 'H';
+        for(int i = 1; i < coordinates.size(); i++){
             boardPreview[coordinates.get(i).x][coordinates.get(i).y] = 'x';
         }
 
