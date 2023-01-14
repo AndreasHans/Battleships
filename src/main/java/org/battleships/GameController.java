@@ -22,15 +22,13 @@ public class GameController {
     static boolean firstMove = true;
     static boolean gameNotFound = true;
 
-    static String serverIp = "10.209.126.122";
-    static String playerIp = "10.209.126.122";
-    static String opponentIp = "";
+    static String serverIp = "82.211.207.77";
+    static String playerIp = "82.211.207.77";
     static String serverPort = "1000";
     static String playerPort;
-    static String opponentPort;
-    static String playerId;
 
-    static RemoteSpace lobby;
+    static RemoteSpace server;
+    static Space messages;
     static RemoteSpace opponentBoard;
     static Space myBoard;
     static SpaceRepository repository;
@@ -45,7 +43,6 @@ public class GameController {
             createShips();
             placeShips();
 
-            if (player == 2) opponentBoard.put("token");
             view.updateBoard();
 
             // Game loop
@@ -71,95 +68,77 @@ public class GameController {
         } catch (Exception e) { e.printStackTrace(); }
     }
 
-    private static void findGame() throws IOException, InterruptedException {
+    private static void findGame() throws InterruptedException, IOException {
 
-        playerId = generatePlayerId();
         playerPort = generatePort();
-        lobby = new RemoteSpace("tcp://" + serverIp + ":" + serverPort + "/lobby?keep");
 
-        // Create space for own board
+        // Setup spaces
+        server = new RemoteSpace("tcp://" + serverIp + ":" + serverPort + "/server?keep");
+        messages = new SequentialSpace();
         myBoard = new PileSpace();
         repository = new SpaceRepository();
-        repository.add(playerId, myBoard);
+        repository.add("board", myBoard);
+        repository.add("response", messages);
         repository.addGate("tcp://" + playerIp + ":" + playerPort + "/?keep");
 
         Scanner scan = new Scanner(System.in);
         while (gameNotFound) {
             System.out.println("Type create or join");
-            String choice = scan.nextLine().trim();
-            if (choice.equalsIgnoreCase("create")) {
+            String input = scan.nextLine().trim();
+            if (input.equalsIgnoreCase("create")) {
                 createGame();
-            } else if (choice.equalsIgnoreCase("join")) {
+            } else if (input.equalsIgnoreCase("join")) {
                 joinGame();
             }
         }
-        System.out.println("Game start");
+
+        System.out.println("Starting game...");
+    }
+
+    private static void createGame() throws InterruptedException, IOException {
+        server.put("create", playerIp, playerPort, "");
+        Object[] response = messages.get(new FormalField(String.class));
+        String gameId = response[0].toString();
+        System.out.println("Game id: " + gameId);
+        server.put(gameId, "ok");
+        response = messages.get(new FormalField(String.class), new FormalField(String.class));
+        String opponentIp = response[0].toString();
+        String opponentPort = response[1].toString();
+        opponentBoard = new RemoteSpace("tcp://" + opponentIp + ":" + opponentPort + "/board?keep");
+
+        assignPlayerWithNumber(1);
+        gameNotFound = false;
     }
 
     private static void joinGame() throws InterruptedException, IOException {
         Scanner scan = new Scanner(System.in);
         while (gameNotFound) {
-            System.out.println("Enter id:"); // Consider adding option to go back to select join or create
+            System.out.println("Enter game id:");
             String input = scan.nextLine().trim();
 
-            Object[] tuple = lobby.getp(new ActualField(input), new FormalField(String.class), new FormalField(String.class));
-            if (tuple != null) {
-                String opponentId = tuple[0].toString();
-                opponentIp = tuple[1].toString();
-                opponentPort = tuple[2].toString();
-                opponentBoard = new RemoteSpace("tcp://" + opponentIp + ":" + opponentPort + "/" + opponentId + "?keep");
-                opponentBoard.put(playerId, playerIp, playerPort);
-                assignPlayerNumber(2);
+            server.put("join", playerIp, playerPort, input);
+            Object[] response = messages.get(new FormalField(String.class), new FormalField(String.class), new FormalField(String.class));
+            if (response[0].toString().equals("ok")) {
+                String opponentIp = response[1].toString();
+                String opponentPort = response[2].toString();
+                opponentBoard = new RemoteSpace("tcp://" + opponentIp + ":" + opponentPort + "/board?keep");
+
+                assignPlayerWithNumber(2);
+                opponentBoard.put("token");
                 gameNotFound = false;
             } else {
-                System.out.println("Could not find player with id: " + input);
+                System.out.println("Could not find game with id: " + input);
             }
-        }
-    }
-
-    private static void createGame() throws InterruptedException, IOException {
-        System.out.println("Your player id: " + playerId);
-        lobby.put(playerId, playerIp, playerPort);
-
-        // Wait for other player to connect
-        Object[] tuple = myBoard.get(new FormalField(String.class), new FormalField(String.class), new FormalField(String.class));
-        String opponentId = tuple[0].toString();
-        opponentIp = tuple[1].toString();
-        opponentPort = tuple[2].toString();
-
-        opponentBoard = new RemoteSpace("tcp://" + opponentIp + ":" + opponentPort + "/" + opponentId + "?keep");
-
-        // Start game
-        assignPlayerNumber(1);
-        System.out.println("assigned player number: " + player);
-        gameNotFound = false;
-    }
-
-    private static String generatePlayerId() {
-        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        while (true) {
-            String id = "";
-            for (int i = 0; i < 5; i++) {
-                int index = (int) (alphabet.length() * Math.random());
-                id = id + alphabet.charAt(index);
-            }
-            return id;
         }
     }
 
     private static String generatePort() {
-        String alphabet = "0123456789";
-        while (true) {
-            String port = "";
-            for (int i = 0; i < 4; i++) {
-                int index = (int) (alphabet.length() * Math.random());
-                port = port + alphabet.charAt(index);
-            }
-            return port;
-        }
+        int minPort = 50000, maxPort = 65000;
+        int port = (int) (Math.random() * (maxPort - minPort) + minPort);
+        return Integer.toString(port);
     }
 
-    private static void assignPlayerNumber(int number) {
+    private static void assignPlayerWithNumber(int number) {
         player = number;
         opponent = player == 1 ? 2 : 1;
     }
