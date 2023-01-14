@@ -91,9 +91,6 @@ lastly, print the board using
             System.out.println(currentLine);
         }
         System.out.println(bottomFieldLine);
-        System.out.println();
-        System.out.println();
-        System.out.println();
     }
 
     public void preview(ArrayList<Point> coordinates){
@@ -124,9 +121,6 @@ lastly, print the board using
             System.out.println(currentLine);
         }
         System.out.println(bottomFieldLine);
-        System.out.println();
-        System.out.println();
-        System.out.println();
     }
 
     public void setShipYou(int x, int y){//for placing ships
