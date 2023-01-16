@@ -1,4 +1,5 @@
 package org.battleships;
+
 import org.jspace.*;
 
 import java.awt.*;
@@ -21,9 +22,9 @@ public class GameController {
     static int host = 1;
     static String opponentIp,opponentPort;
 
-    static String serverIp = "192.168.1.9";
-    static String playerIp = "192.168.1.9";
-    static String serverPort = "3333";
+    static String serverIp = "192.168.1.4";
+    static String playerIp = "192.168.1.4";
+    static String serverPort = "1000";
     static String playerPort;
     static RemoteSpace server;
     static Space messages;
@@ -36,8 +37,9 @@ public class GameController {
 
     public static void main(String[] args) {
         try {
+            //go here
             findGame();
-            newGameCycle();
+
         } catch (Exception e) { e.printStackTrace(); }
     }
 
@@ -94,6 +96,7 @@ public class GameController {
         repository = new SpaceRepository();
         repository.add("response", messages);
         repository.addGate("tcp://" + playerIp + ":" + playerPort + "/?keep");
+        gameNotFound = true;
 
         Scanner scan = new Scanner(System.in);
         while (gameNotFound) {
@@ -105,7 +108,9 @@ public class GameController {
                 joinGame();
             }
         }
+
         System.out.println("Starting game...");
+        newGameCycle();
     }
 
     private static void createGame() throws InterruptedException, IOException{
@@ -233,28 +238,33 @@ public class GameController {
         }
     }
 
-    public static void waitForTurn() throws InterruptedException {
+    public static void waitForTurn() throws InterruptedException, IOException {
         System.out.println("Waiting for opponent...");
 
         //Timeout Impelmentation starts
-
-        int timeout = 60;//how many seconds for a timout
+        int timeout = 30;//how many seconds for a timout
         boolean breakout = false;
 
-        while(timeout > 0){
+        while(timeout > 0){//runs timeout while checking if the token have been added to the board.
             if(myBoard.queryp(new ActualField("token")) != null){
-                System.out.println("breakout");
                 breakout = true;
                 break;
             }
-            System.out.println(timeout);
+            if(myBoard.queryp(new ActualField("quit")) != null){
+                reciveGracefulQuit();
+            }
+            if(timeout == 60 || timeout == 30 || timeout == 10 ||timeout < 6){
+                System.out.println(timeout);
+            }
+
+
             timeout--;
             TimeUnit.SECONDS.sleep(1);
         }
 
-        if(!breakout){
+        if(!breakout){//time out action
             System.out.println("timeout");
-            //run graceful quit
+            initGracefulQuit();
         }
         //timeout implementation ends: if we get to here, turn is ready to be passed, or graceful should have fired
         myBoard.get(new ActualField("token"));
@@ -384,4 +394,23 @@ public class GameController {
             }
         }
     }
+
+    private static void initGracefulQuit() throws InterruptedException, IOException {
+        System.out.println("Disconnecting");
+        //send quit message
+        opponentBoard.put("quit");
+        //Recieve Ok an delay shortly
+        myBoard.get(new ActualField("closing"));
+        //close game
+        findGame();
+
+    }
+
+    private static void reciveGracefulQuit() throws InterruptedException, IOException {
+        System.out.println("Opponent left the game. Connection might have timed out");
+        opponentBoard.put("closing");
+        //close game
+        findGame();
+    }
+
 }
