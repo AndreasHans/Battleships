@@ -46,6 +46,8 @@ public class GameController {
 
             view.updateBoard();
 
+            if (player == 2) opponentBoard.put("token");
+
             // Game loop
             while (true) {
                 waitForTurn();
@@ -125,7 +127,6 @@ public class GameController {
                 opponentBoard = new RemoteSpace("tcp://" + opponentIp + ":" + opponentPort + "/board?keep");
 
                 assignPlayerWithNumber(2);
-                opponentBoard.put("token");
                 gameNotFound = false;
             } else {
                 System.out.println("Could not find game with id: " + input);
