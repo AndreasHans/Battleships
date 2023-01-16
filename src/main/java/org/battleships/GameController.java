@@ -6,6 +6,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 
 public class GameController {
@@ -22,8 +23,8 @@ public class GameController {
     static boolean firstMove = true;
     static boolean gameNotFound = true;
 
-    static String serverIp = "82.211.207.77";
-    static String playerIp = "82.211.207.77";
+    static String serverIp = "192.168.1.4";
+    static String playerIp = "192.168.1.4";
     static String serverPort = "1000";
     static String playerPort;
 
@@ -224,8 +225,32 @@ public class GameController {
 
     public static void waitForTurn() throws InterruptedException {
         System.out.println("Waiting for opponent...");
+
+        //Timeout Impelmentation starts
+        int timeout = 60;//how many seconds for a timout
+        boolean breakout = false;
+
+        while(timeout > 0){
+            if(myBoard.queryp(new ActualField("token")) != null){
+                System.out.println("breakout");
+                breakout = true;
+                break;
+            }
+            System.out.println(timeout);
+            timeout--;
+            TimeUnit.SECONDS.sleep(1);
+        }
+
+        if(!breakout){
+            System.out.println("timeout");
+            //run gracefulquit
+        }
+        //timeout implementation ends: if we get to here, turn is ready to be passed, or graceful should have fired
+
         myBoard.get(new ActualField("token"));
         System.out.println("Your turn");
+
+
     }
 
     public static boolean hasWon(Space board, int player) throws InterruptedException {
