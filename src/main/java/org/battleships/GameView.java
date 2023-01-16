@@ -9,7 +9,6 @@ public class GameView {
     private char[][] boardEnemy = new char[n][m];
     private char[][] boardYou = new char[n][m];
     private char[][] boardPreview = new char[n][m];
-
     private final String fieldBottom = "___|";
     private final String fieldTop = "   |";
     private final String fieldLeft = " ";
@@ -17,7 +16,6 @@ public class GameView {
     private final String spacing = "      |";
     private final String tagLineSpacing = "       You ";
     private final String tagLineField = "    ";
-
     private StringBuilder bottomFieldLine = new StringBuilder("");
     private StringBuilder topFieldLine = new StringBuilder("");
     private StringBuilder topLine = new StringBuilder("   |");

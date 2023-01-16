@@ -5,8 +5,8 @@ import java.io.IOException;
 
 public class Server {
 
-    static String ip = "82.211.207.77";
-    static String port = "1000";
+    static String ip = "192.168.1.9";
+    static String port = "3333";
 
     static Space server;
     static Space games;
