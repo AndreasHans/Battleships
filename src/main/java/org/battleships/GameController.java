@@ -22,8 +22,8 @@ public class GameController {
     static boolean gameNotFound = true;
     static int host = 1;
     static String opponentIp,opponentPort;
-    static String serverIp = "192.168.1.4";
-    static String playerIp = "192.168.1.4";
+    static String serverIp = "192.168.1.9";
+    static String playerIp = "192.168.1.9";
     static String serverPort = "3333";
     static String playerPort;
     static RemoteSpace server;
@@ -274,7 +274,7 @@ public class GameController {
         return over;
     }
 
-    public static void getShotTarget() throws InterruptedException, IOException {
+    public static void getShotTarget() throws InterruptedException{
         // Input scanner
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         while (true) {

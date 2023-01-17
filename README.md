@@ -1,15 +1,13 @@
-# jSpace
-jSpace is a Java library that supports programming of Concurrent and Distributed applications with Spaces.
+# Battleships
+This is a program where you can play the game Battleships.
+The program runs in the console. No external files should be necessary.
+The project has been developed using openJDK 17/18.
 
-jSpace borns as a fork of jResp (https://github.com/michele-loreti/jResp).
+## How to run the program
+First, run 1 instance of **server.java**, and enter the ip of the device you are on and choose a port.
+Then, open 2 instances of **GameController.java**, and in each of then: enter the server ip,
+server port, and the ip of the device you are on. 
 
-## Requirements
-jSpace requires [Java 1.8](https://java.com/) (or higher). Moreover, jSpace is using [Maven](https://maven.apache.org/index.html) for dependency management and building (you can also use one of the IDE that supports it).
-
-## Tutorial
-
-1. [Building and Installing jSpace](./docs/getting_started.md)
-2. [Import jSpace Code in Eclipse](./docs/eclipse_jspace.md)
-3. [Your first jSpace App in Eclipse](./docs/first_application_eclipse.md)
-4. [Your first jSpace App with Maven](./docs/first_application_maven.md)
-5. [Configuring Serialization in jSpace](./docs/jspace_serialization.md)
+## If you have any problems
+See the video demo at
+https://www.youtube.com/watch?v=2hUKDjF8tMA
