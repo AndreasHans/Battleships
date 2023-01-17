@@ -22,8 +22,8 @@ public class GameController {
     static boolean gameNotFound = true;
     static int host = 1;
     static String opponentIp,opponentPort;
-    static String serverIp = "192.168.1.9";
-    static String playerIp = "192.168.1.9";
+    static String serverIp = "192.168.1.4";
+    static String playerIp = "192.168.1.4";
     static String serverPort = "3333";
     static String playerPort;
     static RemoteSpace server;
@@ -420,6 +420,6 @@ public class GameController {
         if(!input.equalsIgnoreCase("no")) serverPort = input;
         System.out.println("What is your ip? eg. 192.168.1.2");
         input = scan.nextLine().trim();
-        if(!input.equalsIgnoreCase("no")) serverPort = input;
+        if(!input.equalsIgnoreCase("no")) playerIp = input;
     }
 }
