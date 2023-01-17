@@ -11,7 +11,6 @@ import java.util.concurrent.TimeUnit;
 
 
 public class GameController {
-
     static int BOARD_SIZE = 5;
     static int NUMBER_OF_SHIPS = 3;
     static int player; // Variable that store whether you are player 1 or 2
@@ -21,10 +20,9 @@ public class GameController {
     static boolean gameNotFound = true;
     static int host = 1;
     static String opponentIp,opponentPort;
-
-    static String serverIp = "192.168.1.4";
-    static String playerIp = "192.168.1.4";
-    static String serverPort = "1000";
+    static String serverIp = "192.168.1.9";
+    static String playerIp = "192.168.1.9";
+    static String serverPort = "3333";
     static String playerPort;
     static RemoteSpace server;
     static Space messages;
@@ -37,13 +35,13 @@ public class GameController {
 
     public static void main(String[] args) {
         try {
-            //go here
+            setDetails();
             findGame();
-
         } catch (Exception e) { e.printStackTrace(); }
     }
 
     private static void newGameCycle() throws InterruptedException, IOException {
+        System.out.println("Starting the game...");
         setup();
         createShips();
         placeShips();
@@ -59,18 +57,16 @@ public class GameController {
             getShotTarget();
             shootAtTarget();
             endTurn();
-
             if(hasWon(opponentBoard,player)) break;
 
             view.updateBoard();
-
         }
         endGame();
     }
 
     private static void readyUp() throws InterruptedException {
         myBoard.put("ready");
-        System.out.println("Waiting for the other player to place their ships...");
+        System.out.println("Waiting for the other player to finish placing their ships...");
         if(player == host){
             myBoard.get(new ActualField("ready"));
             opponentBoard.get(new ActualField("ready"));
@@ -97,43 +93,41 @@ public class GameController {
         repository.add("response", messages);
         repository.addGate("tcp://" + playerIp + ":" + playerPort + "/?keep");
         gameNotFound = true;
-
-        Scanner scan = new Scanner(System.in);
-        while (gameNotFound) {
-            System.out.println("Type create or join");
-            String input = scan.nextLine().trim();
-            if (input.equalsIgnoreCase("create")) {
-                createGame();
-            } else if (input.equalsIgnoreCase("join")) {
-                joinGame();
-            }
-        }
-
-        System.out.println("Starting game...");
+        System.out.println("Welcome to Battleships!");
+        do{
+            String[] options = {"create","join"};
+            String input = getLegalInput(options);
+            if(input.equalsIgnoreCase("create")) createGame();
+            else if (input.equalsIgnoreCase("join")) joinGame();
+        }while(gameNotFound);
         newGameCycle();
     }
 
-    private static void createGame() throws InterruptedException, IOException{
+    private static void createGame() throws InterruptedException{
         server.put("create", playerIp, playerPort, "");
         Object[] response = messages.get(new FormalField(String.class));
         String gameId = response[0].toString();
-        System.out.println("Game id: " + gameId);
+        System.out.println("The game id is: " + gameId);
+        System.out.println("Waiting for another player to join...");
         server.put(gameId, "ok");
         response = messages.get(new FormalField(String.class), new FormalField(String.class));
+        System.out.println("A player has joined the game!");
         opponentIp = response[0].toString();
         opponentPort = response[1].toString();
         assignPlayerWithNumber(1);
         gameNotFound = false;
     }
 
-    private static void joinGame() throws InterruptedException, IOException {
+    private static void joinGame() throws InterruptedException {
         Scanner scan = new Scanner(System.in);
         while (gameNotFound) {
-            System.out.println("Enter game id:");
+            System.out.println("Enter the game id:");
             String input = scan.nextLine().trim();
+            System.out.println("Searching...");
             server.put("join", playerIp, playerPort, input);
             Object[] response = messages.get(new FormalField(String.class), new FormalField(String.class), new FormalField(String.class));
             if (response[0].toString().equals("ok")) {
+                System.out.println("Joining...");
                 opponentIp = response[1].toString();
                 opponentPort = response[2].toString();
                 assignPlayerWithNumber(2);
@@ -156,12 +150,9 @@ public class GameController {
     }
 
     public static void endGame() throws InterruptedException, IOException {
-        System.out.println("Game over");
+        System.out.println("Game over!");
         System.out.println(winner == player ? "You won!" : "You lost.");
-
         Continue();
-
-
     }
 
     public static void endTurn() throws InterruptedException {
@@ -178,26 +169,29 @@ public class GameController {
     }
 
     public static void placeShip(Ship ship, int id) throws InterruptedException {
-        System.out.println("You are about to place the following ship");
+        System.out.println("You are about to place the following ship.");
         view.preview(ship.getPreviewPoints(BOARD_SIZE));
         doRotations(ship);
+        boolean illegal;
         do{
             Point p = getInputPoint();
             ship.setCenter(p);
-        }while(!model.isValidShipPlacement(ship,myBoard));
+            illegal = !model.isValidShipPlacement(ship,myBoard);
+            if(illegal) System.out.println("You can't place the ship there.");
+        }while(illegal);
         model.placeShip(ship,id,myBoard);
-        System.out.println("Successfully placed ship!");
+        System.out.println("Successfully placed the ship!");
     }
 
     public static void doRotations(Ship ship){
-        Scanner scan = new Scanner(System.in);
+        String[] options = {"rotate","done"};
         while(true){
-            System.out.println("Do you want to rotate the ship 90 degrees clockwise?\nType rotate to rotate, type ok when done");
-            String r = scan.next();
-            if(r.equalsIgnoreCase("ok")) break;
-            else if (r.equalsIgnoreCase("rotate")){
+            System.out.println("You can rotate the ship 90 degrees clockwise or go on and place the ship.");
+            String input = getLegalInput(options);
+            if(input.equalsIgnoreCase("done")) break;
+            else {
                 ship.rotate();
-                System.out.println("Ship successfully rotated");
+                System.out.println("Ship rotated successfully!");
                 view.preview(ship.getPreviewPoints(BOARD_SIZE));
             }
         }
@@ -222,7 +216,6 @@ public class GameController {
         }
     }
 
-
     public static void createShips(){
         for(int i = 0; i < NUMBER_OF_SHIPS; i++){
             Ship ship = new Ship();
@@ -239,9 +232,9 @@ public class GameController {
     }
 
     public static void waitForTurn() throws InterruptedException, IOException {
-        System.out.println("Waiting for opponent...");
+        System.out.println("Waiting for the opponent to shoot...");
 
-        //Timeout Impelmentation starts
+        //Timeout Implementation starts
         int timeout = 30;//how many seconds for a timout
         boolean breakout = false;
 
@@ -251,7 +244,7 @@ public class GameController {
                 break;
             }
             if(myBoard.queryp(new ActualField("quit")) != null){
-                reciveGracefulQuit();
+                receiveGracefulQuit();
             }
             if(timeout == 60 || timeout == 30 || timeout == 10 ||timeout < 6){
                 System.out.println(timeout);
@@ -263,7 +256,7 @@ public class GameController {
         }
 
         if(!breakout){//time out action
-            System.out.println("timeout");
+            System.out.println("Your opponent took too long and got timed out!");
             initGracefulQuit();
         }
         //timeout implementation ends: if we get to here, turn is ready to be passed, or graceful should have fired
@@ -282,20 +275,20 @@ public class GameController {
     public static void getShotTarget() throws InterruptedException {
         // Input scanner
         Scanner scan = new Scanner(System.in);
-
         while (true) {
             // Read input
             try {
-                System.out.println("Enter coordinates of target square");
+                System.out.println("Enter coordinates of the target square");
                 targetX = scan.nextInt();
                 targetY = scan.nextInt();
             } catch (Exception e) {
-                System.out.println("Invalid input");
+                System.out.println("Invalid input. Try again!");
                 continue;
             }
 
             // Check input is in valid range
             if (!model.isInsideBoard(targetX, targetY)) {
+                System.out.println("The point lies outside the board. Try again!");
                 continue;
             }
 
@@ -303,17 +296,18 @@ public class GameController {
             if (!model.hasShotAt(targetX, targetY, opponentBoard)) {
                 break;
             }
+            else System.out.println("You have already shot there. Try again!");
         }
     }
 
     public static void shootAtTarget() throws InterruptedException {
-        System.out.println("Shooting");
+        System.out.println("Shooting...");
         int shipId = model.shootAt(targetX, targetY, opponentBoard);
         if (shipId == 0) {
-            System.out.println("Miss");
+            System.out.println("You missed.");
             view.markMissEnemy(targetX, targetY);
         } else {
-            System.out.println("Hit");
+            System.out.println("You hit a ship!");
             view.markHitEnemy(targetX, targetY);
             if (!model.containsShipWithId(shipId, opponentBoard)) {
                 System.out.println("You sunk a ship!");
@@ -348,9 +342,9 @@ public class GameController {
         String input;
         boolean legalInput;
         do {
-            System.out.println("Select one of the following options:" + Arrays.toString(options));
+            System.out.println("You must choose one of the following options:" + Arrays.toString(options));
             input = scanner.nextLine();
-            input.trim().toLowerCase();
+            input = input.trim().toLowerCase();
             legalInput = Arrays.asList(options).contains(input);
         } while (!legalInput);
         return input;
@@ -366,51 +360,58 @@ public class GameController {
         String[] options = {"again","quit"};
         String decision = getLegalInput(options);
         myBoard.put(decision);
-        System.out.println("Waiting for the other player...");
-
         if(player == host){
             Boolean p1 = playAgain(myBoard);
+            System.out.println("Communicating with the other player... ");
             Boolean p2 = playAgain(opponentBoard);
-            if (p1 && p2 ){
+            if (p1 && p2){
                 opponentBoard.put("host","again");
-                System.out.println("starting new game...");
                 newGameCycle();
             }else{
                 opponentBoard.put("host","quit");
-                System.out.println("quitting...");
-                //TODO: GRACEFULLY QUIT
+                initGracefulQuit();
             }
         }
         else{
             Object[] obj = myBoard.get(new ActualField("host"),new FormalField(String.class));
-            Boolean isAgain = obj[1].toString().equalsIgnoreCase("again");
+            boolean isAgain = obj[1].toString().equalsIgnoreCase("again");
             if(isAgain){
-                System.out.println("starting new game...");
                 newGameCycle();
             }
-            else{
-                System.out.println("quitting...");
-                //TODO: GRACEFULLY QUIT
-            }
+            else receiveGracefulQuit();
         }
     }
 
     private static void initGracefulQuit() throws InterruptedException, IOException {
-        System.out.println("Disconnecting");
+        System.out.println("You will now quit the game!");
         //send quit message
         opponentBoard.put("quit");
-        //Recieve Ok an delay shortly
+        //Receive Ok a delay shortly
         myBoard.get(new ActualField("closing"));
         //close game
+        System.out.println("Returning to the start screen...");
         findGame();
-
     }
 
-    private static void reciveGracefulQuit() throws InterruptedException, IOException {
-        System.out.println("Opponent left the game. Connection might have timed out");
+    private static void receiveGracefulQuit() throws InterruptedException, IOException {
+        System.out.println("Your opponent has left the game.");
         opponentBoard.put("closing");
         //close game
+        System.out.println("Returning to the start screen...");
         findGame();
     }
 
+    private static void setDetails(){
+        Scanner scan = new Scanner(System.in);
+        String input;
+        System.out.println("What is the server ip? eg. 192.168.1.2");
+        input = scan.nextLine().trim();
+        if(!input.equalsIgnoreCase("no")) serverIp = input;
+        System.out.println("What is the server port? eg. 3456");
+        input = scan.nextLine().trim();
+        if(!input.equalsIgnoreCase("no")) serverPort = input;
+        System.out.println("What is your ip? eg. 192.168.1.2");
+        input = scan.nextLine().trim();
+        if(!input.equalsIgnoreCase("no")) serverPort = input;
+    }
 }

@@ -127,7 +127,7 @@ public class TestGameModel {
         assertTrue(gameModel.hasShotAt(0,0,space));
     }
 
-    @Test //check you havent shot when you havent shot
+    @Test //check you haven't shot when you haven't shot
     public void testShoot2() throws InterruptedException {
         assertFalse(gameModel.hasShotAt(0,0,space));
     }

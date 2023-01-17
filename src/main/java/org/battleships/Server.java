@@ -2,6 +2,7 @@ package org.battleships;
 import org.jspace.*;
 
 import java.io.IOException;
+import java.util.Scanner;
 
 public class Server {
 
@@ -16,6 +17,7 @@ public class Server {
         SpaceRepository repository = new SpaceRepository();
         server = new SequentialSpace();
         games = new SequentialSpace();
+        setDetails();
         repository.add("server", server);
         repository.addGate("tcp://" + ip + ":" + port + "/?keep");
         System.out.println("Server started");
@@ -66,8 +68,21 @@ public class Server {
         String id = "";
         for (int i = 0; i < 5; i++) {
             int index = (int) (alphabet.length() * Math.random());
-            id = id + alphabet.charAt(index);
+            id += alphabet.charAt(index);
         }
         return id;
     }
+
+    private static void setDetails(){
+        Scanner scan = new Scanner(System.in);
+        String input;
+        System.out.println("What is the server ip? eg. 192.168.1.2");
+        input = scan.nextLine().trim();
+        if(!input.equalsIgnoreCase("no")) ip = input;
+        System.out.println("What port do you want to use? eg. 3456");
+        input = scan.nextLine().trim();
+        if(!input.equalsIgnoreCase("no")) port = input;
+    }
+
+
 }

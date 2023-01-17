@@ -4,11 +4,11 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class GameView {
-    public int n = 5;//how wide the board is, or in other words, how many x positions
-    public int m = 5;//how tall the board is, or in other words, how many y positions
-    private char[][] boardEnemy = new char[n][m];
-    private char[][] boardYou = new char[n][m];
-    private char[][] boardPreview = new char[n][m];
+    public int n;//how wide the board is, or in other words, how many x positions
+    public int m;//how tall the board is, or in other words, how many y positions
+    private char[][] boardEnemy;
+    private char[][] boardYou;
+    private char[][] boardPreview;
     private final String fieldBottom = "___|";
     private final String fieldTop = "   |";
     private final String fieldLeft = " ";
@@ -16,15 +16,15 @@ public class GameView {
     private final String spacing = "      |";
     private final String tagLineSpacing = "       You ";
     private final String tagLineField = "    ";
-    private StringBuilder bottomFieldLine = new StringBuilder("");
-    private StringBuilder topFieldLine = new StringBuilder("");
+    private StringBuilder bottomFieldLine = new StringBuilder();
+    private StringBuilder topFieldLine = new StringBuilder();
     private StringBuilder topLine = new StringBuilder("   |");
-    private StringBuilder EnemeyTagLine = new StringBuilder("Enemy   ");
+    private StringBuilder EnemyTagLine = new StringBuilder("Enemy   ");
     private StringBuilder PreviewTagLine = new StringBuilder("Preview ");
 
 /*
-USER MANUAL: first, create a gameView object with a n times m board
-    GameView gameView = new GameView(n,m);
+USER MANUAL: first, create a gameView object with an n times m board
+    GameView = new GameView(n,m);
 Then, use the following to change the board
     gameView.setShipYou(x,y);
     gameView.markMissEnemy(x,y);
@@ -61,7 +61,7 @@ lastly, print the board using
         //readies the top line
         topLineBuilder();
         //readies the tagline
-        tagLineBilder();
+        tagLineBuilder();
 
     }
 
@@ -69,7 +69,7 @@ lastly, print the board using
 
     public void updateBoard(){
         System.out.println();
-        System.out.println(EnemeyTagLine);
+        System.out.println(EnemyTagLine);
         System.out.println(topLine);
         for(int i = 0; i < m; i++){//prints most of the board, each cycle printing the bottom of the field before, the top of this field, and the middle of this field
             System.out.println(bottomFieldLine);
@@ -78,7 +78,7 @@ lastly, print the board using
             //build the middle of the field start
             StringBuilder currentLine = new StringBuilder(fieldLeft);
             currentLine.append(i).append(fieldRight);
-            for(int j = 0; j < n; j++){//intputs the right chars in enemy board
+            for(int j = 0; j < n; j++){//inputs the right chars in enemy board
                 currentLine.append(fieldLeft).append(boardEnemy[j][i]).append(fieldRight);
             }
             currentLine.append(spacing).append(fieldLeft).append(i).append(fieldRight);
@@ -108,7 +108,7 @@ lastly, print the board using
             //build the middle of the field start
             StringBuilder currentLine = new StringBuilder(fieldLeft);
             currentLine.append(i).append(fieldRight);
-            for(int j = 0; j < n; j++){//intputs the right chars in enemy board
+            for(int j = 0; j < n; j++){//inputs the right chars in enemy board
                 currentLine.append(fieldLeft).append(boardPreview[j][i]).append(fieldRight);
             }
             currentLine.append(spacing).append(fieldLeft).append(i).append(fieldRight);
@@ -164,16 +164,16 @@ lastly, print the board using
         }
     }
 
-    private void tagLineBilder() {
+    private void tagLineBuilder() {
         for(int i = 0; i < n-1; i++){
             PreviewTagLine.append(tagLineField);
-            EnemeyTagLine.append(tagLineField);
+            EnemyTagLine.append(tagLineField);
         }
         PreviewTagLine.append(tagLineSpacing);
-        EnemeyTagLine.append(tagLineSpacing);
+        EnemyTagLine.append(tagLineSpacing);
         for(int i = 0; i < n; i++){
             PreviewTagLine.append(tagLineField);
-            EnemeyTagLine.append(tagLineField);
+            EnemyTagLine.append(tagLineField);
         }
     }
 
@@ -202,13 +202,4 @@ lastly, print the board using
             }
         }
     }
-
-    public void preset(){//for testing purposes
-        setShipYou(0,2);
-        setShipYou(0,3);
-        setShipYou(0,4);
-        setShipYou(1,4);
-        setShipYou(3,3);
-    }
-
 }
