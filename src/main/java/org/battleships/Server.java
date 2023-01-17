@@ -7,8 +7,7 @@ import java.util.Scanner;
 public class Server {
 
     static String ip = "192.168.1.2";
-    static String port = "1234";
-
+    static String port = "3456";
     static Space server;
     static Space games;
 

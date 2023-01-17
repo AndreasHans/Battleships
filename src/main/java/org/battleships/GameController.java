@@ -22,9 +22,9 @@ public class GameController {
     static boolean gameNotFound = true;
     static int host = 1;
     static String opponentIp,opponentPort;
-    static String serverIp = "192.168.1.9";
-    static String playerIp = "192.168.1.9";
-    static String serverPort = "3333";
+    static String serverIp = "192.168.1.2";
+    static String playerIp = "192.168.1.2";
+    static String serverPort = "3456";
     static String playerPort;
     static RemoteSpace server;
     static Space messages;
