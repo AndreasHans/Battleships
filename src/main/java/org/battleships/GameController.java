@@ -3,6 +3,8 @@ package org.battleships;
 import org.jspace.*;
 
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.io.IOException;
 import java.util.Arrays;
@@ -272,15 +274,21 @@ public class GameController {
         return over;
     }
 
-    public static void getShotTarget() throws InterruptedException {
+    public static void getShotTarget() throws InterruptedException, IOException {
         // Input scanner
-        Scanner scan = new Scanner(System.in);
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         while (true) {
             // Read input
             try {
                 System.out.println("Enter coordinates of the target square");
-                targetX = scan.nextInt();
-                targetY = scan.nextInt();
+                while(!br.ready()){
+                    if(myBoard.queryp(new ActualField("quit")) != null){
+                        receiveGracefulQuit();
+                    }
+                }
+                int[] input = Arrays.stream(br.readLine().split("\\s+")).mapToInt(Integer::parseInt).toArray();
+                targetX = input[0];
+                targetY = input[1];
             } catch (Exception e) {
                 System.out.println("Invalid input. Try again!");
                 continue;
